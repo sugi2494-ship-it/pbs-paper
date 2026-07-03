@@ -185,11 +185,13 @@ body{font-family:var(--font);background:var(--bg-page);color:var(--text-primary)
 .pw-wrap{max-width:360px;margin:60px auto;text-align:center;}
 .pw-wrap input{width:100%;text-align:center;font-size:22px;letter-spacing:.4em;padding:14px;border:1.5px solid var(--border-default);border-radius:var(--r-md);margin:16px 0;font-family:var(--font);}
 .err{color:var(--engine-red);font-size:13px;font-weight:700;min-height:18px;}
+.print-only{display:none;}
 .foot{text-align:center;padding:34px 18px 44px;color:var(--text-muted);font-size:12px;line-height:1.7;}
 .foot b{color:var(--text-secondary);}
 .back-link{display:inline-flex;align-items:center;gap:5px;font-size:13px;color:var(--text-muted);text-decoration:none;font-weight:700;margin-bottom:8px;cursor:pointer;}
 @media print{
   .top,.qprogress,.sticky-cta,.no-print,.foot,.back-link{display:none!important;}
+  .print-only{display:block!important;}
   .screen{display:none!important;}
   #screen-result.active{display:block!important;}
   body{background:#fff;}
@@ -257,10 +259,20 @@ body{font-family:var(--font);background:var(--bg-page);color:var(--text-primary)
           <input id="f-date" type="date">
         </div>
       </div>
+      <div class="field">
+        <label>직업군 <span class="req">*</span></label>
+        <select id="f-jobgroup">
+          <option value="">선택하세요</option>
+          <option>경영·관리직</option><option>영업·마케팅</option><option>기획·사무</option>
+          <option>교육·강사</option><option>상담·복지</option><option>IT·개발</option>
+          <option>연구·기술</option><option>의료·보건</option><option>예술·디자인</option>
+          <option>서비스·판매</option><option>학생</option><option>기타</option>
+        </select>
+      </div>
       <div class="grid2">
         <div class="field">
           <label>직업 · 소속(회사명) <span class="req">*</span></label>
-          <input id="f-job" type="text" placeholder="예: 마케팅 / OO기업 / OO학교" maxlength="40">
+          <input id="f-job" type="text" placeholder="예: 마케팅팀 / OO기업 / OO학교" maxlength="40">
         </div>
         <div class="field">
           <label>연령대 <span class="req">*</span></label>
@@ -686,11 +698,16 @@ let DB=null, DBREADY=false;
 })();
 
 async function saveRecord(){
+  if(STATE._saved) return {ok:true,id:STATE.recordId};
+  STATE._saved=true;
   const r=STATE.result, u=STATE.user;
   const scores={engines:{},gears:{}};
   Object.keys(r.engineScores).forEach(e=>scores.engines[e]=r.engineScores[e].percent);
   ALL_GEARS.forEach(g=>scores.gears[g]=r.gearScores[g].percent);
   scores.diag_date=u.diagDate||null; scores.entry_mode=STATE.mode||'paper';
+  scores.job_group=u.jobGroup||null;
+  scores.survey=STATE.survey||null;
+  scores.satisfaction=(STATE.survey&&STATE.survey.satisfaction!=null)?STATE.survey.satisfaction:null;
   const ageNum=parseInt((u.age||'').replace(/[^0-9]/g,''))||null;
   const payload={
     test_type:TEST_TYPE, is_premium:false, code_id:null,
@@ -712,22 +729,26 @@ async function saveRecord(){
     return {ok:true,id:data?.id};
   }catch(e){ console.warn('[PBS] 기록 저장 실패',e); return {ok:false,error:e.message}; }
 }
-async function saveReview(text){
+async function saveReview(text,stars,imgDataUrl){
   if(!DBREADY) return {ok:false};
+  let full=text;
+  if(imgDataUrl) full=text+'\n[[PBS_IMG]]'+imgDataUrl;
   try{
     const {error}=await DB.from('pbs_reviews').insert({
-      name:STATE.user.name||'익명', stars:5, text:text,
+      name:STATE.user.name||'익명', stars:stars||5, text:full,
       record_id:STATE.recordId||null, is_visible:true, is_featured:false
     });
     if(error) throw error; return {ok:true};
   }catch(e){ console.warn('[PBS] 소감 저장 실패',e); return {ok:false,error:e.message}; }
 }
+function scheduleSave(){ clearTimeout(STATE._saveTimer); STATE._saveTimer=setTimeout(()=>{ if(!STATE._saved) saveRecord(); },45000); }
 async function saveInquiry(inq){
   if(!DBREADY) return {ok:false};
   try{
     const {error}=await DB.from('pbs_inquiries').insert({
       inquiry_type:inq.type||'general', name:inq.name||'', org:inq.org||null,
-      email:inq.email||null, phone:inq.phone||null, message:inq.message||'', status:'new'
+      email:inq.email||null, phone:inq.phone||null, message:inq.message||'', status:'new',
+      center_slug:'pbs_paper'
     });
     if(error) throw error; return {ok:true};
   }catch(e){ console.warn('[PBS] 문의 저장 실패',e); return {ok:false,error:e.message}; }
@@ -752,13 +773,15 @@ function goInfo(mode){
 function goQuiz(){
   const age=document.getElementById('f-age').value;
   const job=document.getElementById('f-job').value.trim();
+  const jobGroup=document.getElementById('f-jobgroup').value;
   const contact=document.getElementById('f-contact').value.trim();
+  if(!jobGroup){ toast('직업군을 선택해주세요'); return; }
   if(!job){ toast('직업 또는 소속을 입력해주세요'); return; }
   if(!age){ toast('연령대를 선택해주세요'); return; }
   const isEmail=/@/.test(contact);
   STATE.user={
     name:document.getElementById('f-name').value.trim(),
-    job:job,
+    job:job, jobGroup:jobGroup,
     age:age,
     diagDate:document.getElementById('f-date').value||new Date().toISOString().slice(0,10),
     email:isEmail?contact:'',
@@ -890,7 +913,7 @@ function goSummaryResult(){
   if(missing){ toast('모든 항목을 5~25점으로 입력해주세요'); missing.scrollIntoView({behavior:'smooth',block:'center'}); try{missing.focus();}catch(e){} return; }
   STATE.result=resultFromGearPercents(gp);
   renderResult(); show('result');
-  saveRecord().then(r=>{ if(r.ok) console.log('[PBS] 기록 저장 id=',r.id); });
+  scheduleSave();
 }
 function calculateScores(){
   const gs={}; ALL_GEARS.forEach(g=>gs[g]={raw:0,weighted:0,max:0,maxWeighted:0});
@@ -963,7 +986,7 @@ function goResult(){
   STATE.result=computeResult();
   renderResult();
   show('result');
-  saveRecord().then(r=>{ if(r.ok) console.log('[PBS] 기록 저장 id=',r.id); });
+  scheduleSave();
 }
 function renderResult(){
   const r=STATE.result, me=r.mainEngine, ed=ENGINE_DATA[me], u=STATE.user;
@@ -1059,16 +1082,38 @@ function renderResult(){
     </div>`;
   });
   h+=`</div>`;
-  // 소감 + PDF
+  // 간단 설문 + 소감 + PDF
   h+=`<div class="card no-print">
-    <div class="eyebrow">Reflection</div>
-    <h2>오늘 강의 소감</h2>
-    <p class="sub">강의를 통해 느낀 점을 자유롭게 남겨주세요. 소감을 남기면 결과를 <b>PDF로 저장</b>할 수 있습니다.</p>
-    <div class="field"><textarea id="r-feedback" placeholder="예: 내가 왜 그렇게 행동했는지 이해가 됐어요. 앞으로 강점을 이렇게 활용해보고 싶습니다..." oninput="onFeedback()"></textarea></div>
+    <div class="eyebrow">Survey & Reflection</div>
+    <h2>강점 활용 설문 & 소감</h2>
+    <p class="sub">아래 설문과 소감에 응해주시면 결과를 <b>PDF로 저장</b>할 수 있습니다. 통계는 익명으로 활용됩니다.</p>
+    <div class="field">
+      <label>① 나는 지금 내 강점 컬러를 일·삶에서 잘 활용하고 있다 <span id="sat-val" style="color:var(--brand-purple);font-weight:900;">50</span> / 100</label>
+      <input id="r-sat" type="range" min="0" max="100" value="50" step="5" style="width:100%;accent-color:var(--brand-purple);" oninput="onSat()">
+    </div>
+    ${surveyQ('q1','② 진단 결과가 나와 잘 맞는다고 느꼈다')}
+    ${surveyQ('q2','③ 지금 나의 직업·직무에 만족한다')}
+    ${surveyQ('q3','④ 이 진단이 나를 이해하는 데 도움이 됐다')}
+    ${surveyQ('q4','⑤ 주변에 이 진단을 추천하고 싶다')}
+    <div class="field" style="margin-top:6px;"><label>소감 한마디</label>
+      <textarea id="r-feedback" placeholder="예: 내가 왜 그렇게 행동했는지 이해가 됐어요. 앞으로 강점을 이렇게 활용해보고 싶습니다..." oninput="onFeedback()"></textarea></div>
+    <div class="field">
+      <label>소감 별점</label>
+      <div id="star-row" style="font-size:30px;letter-spacing:4px;cursor:pointer;user-select:none;">
+        ${[1,2,3,4,5].map(n=>`<span onclick="setStar(${n})" data-star="${n}" style="color:#E3DFF0;">★</span>`).join('')}
+      </div>
+    </div>
+    <div class="field">
+      <label>사진 첨부 <span class="opt">(선택)</span></label>
+      <input id="r-image" type="file" accept="image/*" onchange="onImagePick(this)" style="font-size:13px;">
+      <div id="img-preview" style="margin-top:10px;"></div>
+    </div>
     <div id="pdf-zone">
-      <div class="pdf-cta" id="pdf-hint">✍️ 소감을 입력하면 PDF 저장 버튼이 활성화됩니다.</div>
+      <div class="pdf-cta" id="pdf-hint">✍️ 만족도와 소감을 입력하면 PDF 저장 버튼이 활성화됩니다.</div>
     </div>
   </div>`;
+  // 인쇄 전용 소감·이미지 블록
+  h+=`<div id="print-feedback" class="print-only"></div>`;
   // 강사 프로필
   h+=`<div class="card no-print" style="padding:0;overflow:hidden;border:none;background:none;box-shadow:none;">
     <div class="profile-card">
@@ -1132,22 +1177,55 @@ function renderResult(){
   document.getElementById('result-body').innerHTML=h;
 }
 function esc(s){ return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
-let _fbSaved=false;
+let _fbSaved=false, _star=0, _satTouched=false, _sogaImg=null;
+function surveyQ(id,label){
+  return `<div class="field"><label>${label}</label>
+    <div class="scale" data-sq="${id}">${[1,2,3,4,5].map(v=>`<button type="button" onclick="setSurvey('${id}',${v},this)">${v}</button>`).join('')}</div>
+    <div class="scale-legend"><span>전혀 아니다</span><span>매우 그렇다</span></div></div>`;
+}
+const _survey={};
+function setSurvey(id,v,btn){ _survey[id]=v; const row=btn.parentElement; row.querySelectorAll('button').forEach(b=>{b.classList.remove('on');b.style.background='';}); btn.classList.add('on'); btn.style.background='var(--brand-purple)'; onFeedback(); }
+function onSat(){ _satTouched=true; document.getElementById('sat-val').textContent=document.getElementById('r-sat').value; onFeedback(); }
+function setStar(n){ _star=n; document.querySelectorAll('#star-row span').forEach(s=>{ s.style.color = (+s.dataset.star<=n)?'#F5A623':'#E3DFF0'; }); }
+function onImagePick(input){
+  const f=input.files&&input.files[0]; if(!f) return;
+  const img=new Image(); const rd=new FileReader();
+  rd.onload=e=>{ img.onload=()=>{
+      const max=900; let w=img.width,hh=img.height;
+      if(w>max||hh>max){ if(w>hh){hh=Math.round(hh*max/w);w=max;}else{w=Math.round(w*max/hh);hh=max;} }
+      const c=document.createElement('canvas'); c.width=w; c.height=hh; c.getContext('2d').drawImage(img,0,0,w,hh);
+      _sogaImg=c.toDataURL('image/jpeg',0.72);
+      document.getElementById('img-preview').innerHTML=`<img src="${_sogaImg}" style="max-width:100%;max-height:220px;border-radius:12px;border:1px solid var(--border-default);">`;
+    }; img.src=e.target.result; };
+  rd.readAsDataURL(f);
+}
 function onFeedback(){
   const v=document.getElementById('r-feedback').value.trim();
   const zone=document.getElementById('pdf-zone');
-  if(v.length>=5){
+  if(v.length>=5 && _satTouched){
     zone.innerHTML=`<button class="btn btn-primary btn-lg" onclick="savePdf()">📄 결과를 PDF로 저장하기</button>
       <p style="text-align:center;font-size:11px;color:var(--text-muted);margin-top:8px;">인쇄 창에서 "PDF로 저장"을 선택하세요.</p>`;
   }else{
-    zone.innerHTML=`<div class="pdf-cta" id="pdf-hint">✍️ 소감을 입력하면 PDF 저장 버튼이 활성화됩니다.</div>`;
+    zone.innerHTML=`<div class="pdf-cta">✍️ 만족도(①)를 조정하고 소감을 입력하면 PDF 저장이 활성화됩니다.</div>`;
   }
+}
+function collectSurvey(){
+  STATE.survey={ satisfaction:parseInt(document.getElementById('r-sat').value),
+    q1:_survey.q1||null,q2:_survey.q2||null,q3:_survey.q3||null,q4:_survey.q4||null };
 }
 async function savePdf(){
   const v=document.getElementById('r-feedback').value.trim();
-  if(v.length<5){ toast('소감을 조금 더 입력해주세요'); return; }
-  if(!_fbSaved){ _fbSaved=true; const rr=await saveReview(v); if(rr.ok) toast('소감이 저장되었습니다'); }
-  setTimeout(()=>window.print(),300);
+  if(v.length<5||!_satTouched){ toast('만족도와 소감을 입력해주세요'); return; }
+  collectSurvey();
+  await saveRecord();
+  if(!_fbSaved){ _fbSaved=true; const rr=await saveReview(v,_star||5,_sogaImg); if(rr.ok) toast('설문·소감이 저장되었습니다'); }
+  // 인쇄 전용 블록 채우기
+  const pf=document.getElementById('print-feedback');
+  if(pf){ pf.innerHTML=`<div class="card"><h2 style="font-size:16px;">나의 설문 & 소감</h2>
+    <p class="para" style="font-size:13px;">강점 활용도: <b>${STATE.survey.satisfaction}/100</b></p>
+    <p class="para" style="white-space:pre-wrap;">${esc(v)}</p>
+    ${_sogaImg?`<img src="${_sogaImg}" style="max-width:100%;max-height:320px;border-radius:12px;margin-top:8px;">`:''}</div>`; }
+  setTimeout(()=>window.print(),350);
 }
 async function sendInquiry(){
   const name=document.getElementById('i-name').value.trim();
@@ -1165,9 +1243,10 @@ async function sendInquiry(){
     toast('메일 앱으로 연결합니다'); window.location.href=`mailto:pbscolor77@naver.com?subject=${encodeURIComponent('[PBS 컬러강점] 교육 문의')}&body=${body}`;
   }
 }
-function restart(){ STATE.answers={}; STATE.user={}; STATE.result=null; STATE.recordId=null; STATE.startTs=Date.now(); _fbSaved=false;
+function restart(){ if(!STATE._saved && STATE.result) saveRecord(); STATE.answers={}; STATE.user={}; STATE.result=null; STATE.recordId=null; STATE.startTs=Date.now(); STATE._saved=false; _fbSaved=false; _star=0; _satTouched=false; _sogaImg=null; STATE.survey=null; for(const k in _survey) delete _survey[k];
   document.querySelectorAll('.scale button.on').forEach(b=>{b.classList.remove('on');b.style.background='';});
   ['f-name','f-job','f-contact','f-date'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  const jg=document.getElementById('f-jobgroup'); if(jg) jg.value='';
   document.getElementById('f-age').value=''; document.getElementById('f-consent').checked=false;
   updateProgress(); show('intro');
 }
@@ -1201,7 +1280,7 @@ async function loadAdminData(){
       DB.from('pbs_inquiries').select('*').order('created_at',{ascending:false}).limit(500),
       DB.from('pbs_reviews').select('*').order('created_at',{ascending:false}).limit(500)
     ]);
-    ADMIN.records=rec.data||[]; ADMIN.inquiries=inq.data||[];
+    ADMIN.records=rec.data||[]; ADMIN.inquiries=(inq.data||[]).filter(q=>q.center_slug==='pbs_paper');
     // 이 현장진단 프로그램에서 남긴 소감만 필터 (record_id가 본 프로그램 기록에 속하는 것)
     const recIds=new Set(ADMIN.records.map(r=>r.id));
     ADMIN.reviews=(rev.data||[]).filter(rv=>rv.record_id && recIds.has(rv.record_id));
@@ -1249,6 +1328,36 @@ function renderStat(){
     h+=`<div class="dist-row"><div class="dl" style="width:120px;">${esc(k)}</div><div class="dist-track"><div class="dist-fill" style="width:${Math.max(v/jmax*100,6)}%;background:var(--brand-indigo)">${v}</div></div></div>`;
   });
   h+=`</div></div>`;
+  // ---- 직업군별 대표 엔진 분포 ----
+  const jgMap={};
+  recs.forEach(r=>{ const jg=(r.scores&&r.scores.job_group)||'미분류'; const e=r.top_engine; if(!jgMap[jg]) jgMap[jg]={RED:0,YELLOW:0,GREEN:0,BLUE:0,_n:0}; if(e&&jgMap[jg][e]!==undefined){jgMap[jg][e]++;jgMap[jg]._n++;} });
+  h+=`<div class="card"><h2 style="font-size:16px;">직업군별 컬러 엔진 분포</h2>
+    <p style="font-size:11px;color:var(--text-muted);margin:4px 0 12px;">각 직업군에서 어떤 컬러 엔진이 많은지 (막대=대표엔진 인원)</p>`;
+  const jgKeys=Object.keys(jgMap).filter(k=>jgMap[k]._n>0).sort((a,b)=>jgMap[b]._n-jgMap[a]._n);
+  if(!jgKeys.length) h+='<p style="font-size:13px;color:var(--text-muted)">데이터 없음</p>';
+  jgKeys.forEach(jg=>{
+    const m=jgMap[jg]; const top=['RED','YELLOW','GREEN','BLUE'].sort((a,b)=>m[b]-m[a])[0];
+    h+=`<div style="margin-bottom:12px;"><div style="font-size:13px;font-weight:800;margin-bottom:4px;">${esc(jg)} <span style="font-size:11px;color:var(--text-muted);font-weight:600;">(${m._n}명 · 대표 <span style="color:${ENGINE_HEX[top]}">${top}</span>)</span></div>
+      <div style="display:flex;height:20px;border-radius:6px;overflow:hidden;background:var(--bg-muted);">`;
+    ['RED','YELLOW','GREEN','BLUE'].forEach(e=>{ const w=m._n?m[e]/m._n*100:0; if(w>0) h+=`<div style="width:${w}%;background:${ENGINE_HEX[e]}" title="${e} ${m[e]}"></div>`; });
+    h+=`</div></div>`;
+  });
+  h+=`</div>`;
+  // ---- 강점 활용 만족도(0~100) 통계 ----
+  const sats=recs.filter(r=>r.scores&&r.scores.satisfaction!=null);
+  if(sats.length){
+    const avg=Math.round(sats.reduce((s,r)=>s+r.scores.satisfaction,0)/sats.length);
+    const hi=sats.filter(r=>r.scores.satisfaction>=70), lo=sats.filter(r=>r.scores.satisfaction<40);
+    const engDist=(rows)=>{ const d={RED:0,YELLOW:0,GREEN:0,BLUE:0}; rows.forEach(r=>{if(d[r.top_engine]!==undefined)d[r.top_engine]++;}); const t=rows.length||1; return ['RED','YELLOW','GREEN','BLUE'].map(e=>`<span style="color:${ENGINE_HEX[e]};font-weight:800;">${e} ${Math.round(d[e]/t*100)}%</span>`).join(' · '); };
+    h+=`<div class="card"><h2 style="font-size:16px;">강점 활용 만족도 (0~100)</h2>
+      <p style="font-size:13px;margin:8px 0;">응답 ${sats.length}명 · 평균 <b style="color:var(--brand-purple);font-size:18px;">${avg}점</b></p>
+      <div style="background:var(--engine-green-bg);border-radius:10px;padding:12px;margin-bottom:8px;"><div style="font-weight:800;font-size:13px;color:var(--engine-green);">잘 활용(70점↑) ${hi.length}명</div><div style="font-size:12px;margin-top:4px;">${hi.length?engDist(hi):'데이터 없음'}</div></div>
+      <div style="background:var(--engine-red-bg);border-radius:10px;padding:12px;"><div style="font-weight:800;font-size:13px;color:var(--engine-red);">활용 낮음(40점↓) ${lo.length}명</div><div style="font-size:12px;margin-top:4px;">${lo.length?engDist(lo):'데이터 없음'}</div></div>
+      <p style="font-size:11px;color:var(--text-muted);margin-top:10px;">직업군별 평균 활용도</p>`;
+    const jgSat={}; sats.forEach(r=>{ const jg=(r.scores.job_group)||'미분류'; if(!jgSat[jg]){jgSat[jg]={s:0,n:0};} jgSat[jg].s+=r.scores.satisfaction; jgSat[jg].n++; });
+    Object.entries(jgSat).sort((a,b)=>(b[1].s/b[1].n)-(a[1].s/a[1].n)).forEach(([jg,o])=>{ const av=Math.round(o.s/o.n); h+=`<div class="dist-row"><div class="dl" style="width:110px;">${esc(jg)}</div><div class="dist-track"><div class="dist-fill" style="width:${Math.max(av,6)}%;background:var(--brand-gradient)">${av}</div></div><div style="width:36px;font-size:11px;color:var(--text-muted);">${o.n}명</div></div>`; });
+    h+=`</div>`;
+  }
   h+=`<div style="text-align:center;"><button class="mini-btn" onclick="exportCsv()">📊 진단 데이터 CSV 내보내기</button></div>`;
   document.getElementById('tab-stat').innerHTML=h;
 }
@@ -1284,12 +1393,19 @@ function renderRev(){
   if(!arr.length) h+='<div class="card">등록된 소감이 없습니다.</div>';
   arr.forEach(rv=>{
     const feat=rv.is_featured;
+    const raw=rv.text||''; const parts=raw.split('[[PBS_IMG]]');
+    const body=parts[0].trim(); const img=parts[1]||'';
+    const rec=ADMIN.records.find(x=>x.id===rv.record_id);
+    const stars='★'.repeat(rv.stars||0)+'☆'.repeat(5-(rv.stars||0));
+    const meta=rec?`${rec.top_engine||''} · ${(rec.scores&&rec.scores.job_group)||''}${(rec.scores&&rec.scores.satisfaction!=null)?' · 활용도 '+rec.scores.satisfaction:''}`:'';
     h+=`<div class="admin-item">
       <div class="ai-head">
         <span class="ai-name">${esc(rv.name||'익명')} ${feat?'<span class="badge-tag" style="background:var(--engine-green)">노출중</span>':'<span class="badge-tag" style="background:var(--text-muted)">비공개</span>'}</span>
         <span class="ai-meta">${fmtDate(rv.created_at)}</span>
       </div>
-      <div class="ai-body">${esc(rv.text||'')}</div>
+      <div class="ai-meta" style="margin-bottom:5px;">${'<span style=\'color:#F5A623\'>'+stars+'</span>'} ${meta?'· '+esc(meta):''}</div>
+      <div class="ai-body">${esc(body)}</div>
+      ${img?`<img src="${img}" style="max-width:100%;max-height:220px;border-radius:10px;margin-top:8px;border:1px solid var(--border-subtle);">`:''}
       <div class="ai-actions">
         <button class="mini-btn ${feat?'':'pri'}" onclick="toggleRev('${rv.id}',${!feat})">${feat?'비공개로':'후기로 노출'}</button>
         <button class="mini-btn danger" onclick="delRev('${rv.id}')">삭제</button>
@@ -1318,11 +1434,11 @@ async function delRev(id){
   ADMIN.reviews=ADMIN.reviews.filter(x=>x.id!==id); renderRev(); toast('삭제되었습니다');
 }
 function exportCsv(){
-  const rows=[['입력일시','진단날짜','유형','이름','연령','소속','연락처','이메일','대표엔진','1위기어',...ALL_GEARS]];
+  const rows=[['입력일시','진단날짜','직업군','이름','연령','소속','연락처','이메일','대표엔진','1위기어','강점활용도','설문공감','직무만족','자기이해','추천의향',...ALL_GEARS]];
   ADMIN.records.forEach(r=>{
-    const g=(r.scores&&r.scores.gears)||{};
-    const dd=(r.scores&&r.scores.diag_date)||''; const em=(r.scores&&r.scores.entry_mode)==='online'?'온라인':'종이';
-    rows.push([fmtDate(r.created_at),dd,em,r.user_name||'',r.user_age||'',r.user_job||'',r.user_phone||'',r.user_email||'',r.top_engine||'',r.top_gear||'',...ALL_GEARS.map(k=>g[k]!=null?g[k]:'')]);
+    const g=(r.scores&&r.scores.gears)||{}; const sc=r.scores||{}; const sv=sc.survey||{};
+    const dd=sc.diag_date||''; const jg=sc.job_group||'';
+    rows.push([fmtDate(r.created_at),dd,jg,r.user_name||'',r.user_age||'',r.user_job||'',r.user_phone||'',r.user_email||'',r.top_engine||'',r.top_gear||'',sc.satisfaction!=null?sc.satisfaction:'',sv.q1||'',sv.q2||'',sv.q3||'',sv.q4||'',...ALL_GEARS.map(k=>g[k]!=null?g[k]:'')]);
   });
   const csv='﻿'+rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
   const blob=new Blob([csv],{type:'text/csv'}); const url=URL.createObjectURL(blob);
