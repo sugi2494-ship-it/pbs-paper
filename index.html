@@ -263,10 +263,10 @@ body{font-family:var(--font);background:var(--bg-page);color:var(--text-primary)
         <label>직업군 <span class="req">*</span></label>
         <select id="f-jobgroup">
           <option value="">선택하세요</option>
-          <option value="mgmt">경영·관리</option><option value="sales_mkt">영업·마케팅</option><option value="office_admin">사무·행정</option>
-          <option value="edu">교육·강의</option><option value="counsel_welfare">상담·복지</option><option value="it_tech">IT·기술·연구</option>
-          <option value="medical">의료·보건</option><option value="art_design">예술·디자인</option><option value="service_retail">서비스·판매</option>
-          <option value="production">생산·현장</option><option value="student">학생</option><option value="homemaker_etc">주부·기타</option>
+          <option>경영·관리직</option><option>영업·마케팅</option><option>기획·사무</option>
+          <option>교육·강사</option><option>상담·복지</option><option>IT·개발</option>
+          <option>연구·기술</option><option>의료·보건</option><option>예술·디자인</option>
+          <option>서비스·판매</option><option>학생</option><option>기타</option>
         </select>
       </div>
       <div class="grid2">
@@ -290,11 +290,7 @@ body{font-family:var(--font);background:var(--bg-page);color:var(--text-primary)
       </div>
       <label style="display:flex;gap:9px;align-items:flex-start;font-size:12.5px;color:var(--text-secondary);cursor:pointer;margin-top:4px;">
         <input id="f-consent" type="checkbox" style="width:auto;margin-top:3px;flex-shrink:0;">
-        <span>입력하신 정보와 진단 결과는 <b>개인을 식별할 수 없는 통계 형태</b>로 연구, 교육 콘텐츠, 도서·보도자료 제작에 활용될 수 있습니다. 이에 동의합니다.</span>
-      </label>
-      <label style="display:flex;gap:9px;align-items:flex-start;font-size:12.5px;color:var(--text-secondary);cursor:pointer;margin-top:8px;">
-        <input id="f-mkconsent" type="checkbox" style="width:auto;margin-top:3px;flex-shrink:0;">
-        <span>(선택) PBS COLOR LAB의 진단 리포트와 교육 소식을 이메일로 받는 것에 동의합니다.</span>
+        <span>강의 개선 및 통계 목적의 데이터 수집·활용에 동의합니다. (개인정보는 통계 외 용도로 사용되지 않습니다.)</span>
       </label>
       <button class="btn btn-primary btn-lg" style="margin-top:20px;" id="info-next" onclick="goQuiz()">다음 →</button>
     </div>
@@ -364,12 +360,10 @@ body{font-family:var(--font);background:var(--bg-page);color:var(--text-primary)
         <button class="on" data-tab="stat" onclick="adminTab('stat')">통계</button>
         <button data-tab="inq" onclick="adminTab('inq')">문의</button>
         <button data-tab="rev" onclick="adminTab('rev')">소감</button>
-        <button data-tab="code" onclick="adminTab('code')">강사코드</button>
       </div>
       <div id="tab-stat" class="admin-tab"></div>
       <div id="tab-inq" class="admin-tab" style="display:none;"></div>
       <div id="tab-rev" class="admin-tab" style="display:none;"></div>
-      <div id="tab-code" class="admin-tab" style="display:none;"></div>
     </div>
   </div>
 </section>
@@ -685,8 +679,6 @@ const ENGINE_EXTRA = {
 };
 const ADMIN_PW = '8808';
 const TEST_TYPE = 'paper_60';
-const ENTRY_PATH = 'paper_qr';
-const AGE_BAND = {'10대':'10s','20대':'20s','30대':'30s','40대':'40s','50대':'50s','60대 이상':'60s+'};
 
 const STATE = { answers:{}, user:{}, result:null, recordId:null, startTs:Date.now() };
 
@@ -706,14 +698,14 @@ let DB=null, DBREADY=false;
 })();
 
 async function saveRecord(){
-  if(STATE._saved) return updateRecordSurvey();
+  if(STATE._saved) return {ok:true,id:STATE.recordId};
   STATE._saved=true;
   const r=STATE.result, u=STATE.user;
   const scores={engines:{},gears:{}};
   Object.keys(r.engineScores).forEach(e=>scores.engines[e]=r.engineScores[e].percent);
   ALL_GEARS.forEach(g=>scores.gears[g]=r.gearScores[g].percent);
   scores.diag_date=u.diagDate||null; scores.entry_mode=STATE.mode||'paper';
-  scores.job_group=u.jobGroupLabel||u.jobGroup||null;
+  scores.job_group=u.jobGroup||null;
   scores.survey=STATE.survey||null;
   scores.satisfaction=(STATE.survey&&STATE.survey.satisfaction!=null)?STATE.survey.satisfaction:null;
   const ageNum=parseInt((u.age||'').replace(/[^0-9]/g,''))||null;
@@ -722,10 +714,6 @@ async function saveRecord(){
     user_name:u.name||null, user_age:ageNum, user_gender:null,
     user_org:u.job||null, user_email:u.email||null, user_phone:u.phone||null, user_job:u.job||null,
     inst_name:'최해숙', inst_org:'PBS COLOR LAB', user_consent:!!u.consent,
-    entry_path:ENTRY_PATH, job_group:u.jobGroup||null,
-    age_band:AGE_BAND[u.age]||null,
-    job_satisfaction:(STATE.survey&&STATE.survey.q2)||null,
-    marketing_consent:!!u.mkConsent,
     answers: (STATE.mode==='online' ? STATE.answers : {gear_sums:STATE.summaryGears||{}}), scores:scores,
     top_engine:r.mainEngine, top_gear:r.top1.gear, second_engine:r.rankedEngines[1]?.engine||null,
     duration_sec:Math.max(1,Math.round((Date.now()-STATE.startTs)/1000)),
@@ -740,24 +728,6 @@ async function saveRecord(){
     STATE.recordId=data?.id;
     return {ok:true,id:data?.id};
   }catch(e){ console.warn('[PBS] 기록 저장 실패',e); return {ok:false,error:e.message}; }
-}
-async function updateRecordSurvey(){
-  if(!DBREADY||!STATE.recordId||!STATE.survey) return {ok:true,id:STATE.recordId};
-  try{
-    const r=STATE.result,u=STATE.user;
-    const scores={engines:{},gears:{}};
-    Object.keys(r.engineScores).forEach(e=>scores.engines[e]=r.engineScores[e].percent);
-    ALL_GEARS.forEach(g=>scores.gears[g]=r.gearScores[g].percent);
-    scores.diag_date=u.diagDate||null; scores.entry_mode=STATE.mode||'paper';
-    scores.job_group=u.jobGroupLabel||u.jobGroup||null;
-    scores.survey=STATE.survey||null;
-    scores.satisfaction=(STATE.survey&&STATE.survey.satisfaction!=null)?STATE.survey.satisfaction:null;
-    const {error}=await DB.from('pbs_records').update({
-      scores:scores, job_satisfaction:(STATE.survey&&STATE.survey.q2)||null
-    }).eq('id',STATE.recordId);
-    if(error) throw error;
-    return {ok:true,id:STATE.recordId};
-  }catch(e){ console.warn('[PBS] 설문 업데이트 실패',e); return {ok:false}; }
 }
 async function saveReview(text,stars,imgDataUrl){
   if(!DBREADY) return {ok:false};
@@ -812,8 +782,6 @@ function goQuiz(){
   STATE.user={
     name:document.getElementById('f-name').value.trim(),
     job:job, jobGroup:jobGroup,
-    jobGroupLabel:(document.getElementById('f-jobgroup').selectedOptions[0]||{}).text||jobGroup,
-    mkConsent:document.getElementById('f-mkconsent')?document.getElementById('f-mkconsent').checked:false,
     age:age,
     diagDate:document.getElementById('f-date').value||new Date().toISOString().slice(0,10),
     email:isEmail?contact:'',
@@ -1021,12 +989,13 @@ function goResult(){
   scheduleSave();
 }
 function renderResult(){
-  const r=STATE.result, me=r.mainEngine, ed=ENGINE_DATA[me], u=STATE.user;
+  const r=STATE.result, me=r.mainEngine, ed=ENGINE_DATA[me], ex=ENGINE_EXTRA[me], u=STATE.user;
+  const bg=me==='RED'?'var(--engine-red-bg)':me==='YELLOW'?'var(--engine-yellow-bg)':me==='GREEN'?'var(--engine-green-bg)':'var(--engine-blue-bg)';
   const dd=u.diagDate?new Date(u.diagDate).toLocaleDateString('ko-KR',{year:'numeric',month:'long',day:'numeric'}):new Date().toLocaleDateString('ko-KR',{year:'numeric',month:'long',day:'numeric'});
   const modeLabel=STATE.mode==='online'?'온라인 진단':'종이진단';
   let h='';
-  // hero
-  h+=`<div class="card" style="text-align:center;background:linear-gradient(160deg,#fff,${me==='RED'?'var(--engine-red-bg)':me==='YELLOW'?'var(--engine-yellow-bg)':me==='GREEN'?'var(--engine-green-bg)':'var(--engine-blue-bg)'});">
+  // 1) hero
+  h+=`<div class="card" style="text-align:center;background:linear-gradient(160deg,#fff,${bg});">
     <div class="result-hero" style="padding-top:6px;">
       ${u.name?`<div class="rname">${esc(u.name)} 님의 컬러 강점 결과</div>`:'<div class="rname">나의 컬러 강점 결과</div>'}
       <div class="rmain" style="color:${ENGINE_HEX[me]}">${ed.name}</div>
@@ -1035,14 +1004,14 @@ function renderResult(){
     </div>
     <div class="radar-wrap">${renderRadar(r.gearScores)}</div>
   </div>`;
-  // engine bars
+  // 2) engine bars
   h+=`<div class="card"><div class="eyebrow">4 Engine Balance</div><h2>나의 4엔진 강도</h2><p class="sub">각 컬러 엔진이 나를 움직이는 비중입니다.</p><div class="eng-bars">`;
   r.rankedEngines.forEach(e=>{
     h+=`<div class="eng-bar-row"><div class="ebl" style="color:${ENGINE_HEX[e.engine]}">${e.engine}</div>
       <div class="eng-bar-track"><div class="eng-bar-fill" style="width:${Math.max(e.percent,6)}%;background:${ENGINE_HEX[e.engine]}">${e.percent}%</div></div></div>`;
   });
   h+=`</div></div>`;
-  // combo
+  // 3) combo
   h+=`<div class="card"><div class="eyebrow">Top 2 Combination</div><h2>강점 조합</h2>
     <div style="display:flex;gap:10px;margin:10px 0;flex-wrap:wrap;">
       <div style="flex:1;min-width:130px;background:var(--bg-muted);border-radius:var(--r-md);padding:14px;text-align:center;">
@@ -1058,48 +1027,14 @@ function renderResult(){
     </div>
     <div class="combo-box"><div class="clabel">${r.combo.label}</div><p>${r.combo.desc}</p></div>
   </div>`;
-  // detailed interpretation of main engine
-  h+=`<div class="card interp">
-    <div class="eyebrow">Deep Interpretation</div>
-    <h2>${ed.name} — 상세 강점 해석</h2>
-    <div class="chips">${ed.tags.map(t=>`<span>${t}</span>`).join('')}</div>
-    <h3>핵심 강점</h3><ul>${ed.strengths.map(s=>`<li>${s}</li>`).join('')}</ul>
-    <h3>추천 진로·직무</h3><ul>${ed.jobs.map(s=>`<li>${s}</li>`).join('')}</ul>
-    <h3>소통 스타일</h3><p class="para">${ed.communication}</p>
-    <h3>스트레스 요인</h3><ul>${ed.stress.map(s=>`<li>${s}</li>`).join('')}</ul>
-    <h3>관계·연애 패턴</h3><p class="para">${ed.romance}</p>
-    <h3>갈등 대처 방식</h3><p class="para">${ed.conflict}</p>
-    <h3>나를 움직이는 핵심 가치</h3>
-    ${ed.values.map(v=>`<div class="value-item"><div class="vt">${v.title}</div><div class="vd">${v.detail}</div><div class="vb">📖 ${v.basis}</div></div>`).join('')}
-    <h3>성장 포인트</h3>
-    ${ed.growth.map(v=>`<div class="value-item"><div class="vt">${v.title}</div><div class="vd">${v.detail}</div></div>`).join('')}
-    <h3>회복·자기충전 방법</h3>
-    <div class="heal-grid">${ed.healing.map(hl=>`<div class="heal-item"><div class="hl">${hl.label}</div><div class="hd">${hl.desc}</div></div>`).join('')}</div>
-    <h3 style="margin-top:22px;">나를 위한 자기확언</h3>
-    ${ed.affirmations.map(a=>`<div class="affirm"><span class="aq">"</span> ${a} <span class="aq">"</span></div>`).join('')}
-  </div>`;
-  // 업무·관계 심화 (책 '컬러강점' 기반)
-  const ex=ENGINE_EXTRA[me];
-  h+=`<div class="card interp">
-    <div class="eyebrow">Work & Relationships</div>
-    <h2>${ed.shortName} 유형의 업무·관계 심화</h2>
-    <h3>💼 업무 스트레스 요인</h3><ul>${ex.workStress.map(s=>`<li>${s}</li>`).join('')}</ul>
-    <h3>💡 업무 스트레스 대처법</h3><p class="para">${ex.workCope}</p>
-    <h3>❤️ 대인관계에서의 불안</h3><p class="para">${ex.relStress}</p>
-    <h3>🤝 관계 대처법</h3><p class="para">${ex.relCope}</p>
-    <h3>💬 소통 유형</h3><p class="para">${ex.commStyle}</p>
-    <h3>👥 대인관계 — 다름을 보완으로</h3><p class="para">${ex.interpersonal}</p>
-    <div class="combo-box" style="margin-top:14px;"><div class="clabel">🔑 나의 키맨(Key Man) 역할</div><p>${ex.keyman}</p></div>
-    <h3 style="margin-top:16px;">⚠️ 강점이 과할 때 (그림자)</h3><p class="para">${ex.shadow}</p>
-    <h3>🎯 도움이 되는 직무</h3><ul>${ex.jobsDetail.map(s=>`<li>${s}</li>`).join('')}</ul>
-  </div>`;
-  // 상위 강점 기어 상세 (Top 3)
+  // 4) 상위 강점 기어 상세 (Top 3) — 조합 바로 뒤 배치
   const topGears=r.rankedGears.slice(0,3);
-  h+=`<div class="card interp"><div class="eyebrow">My Top Gears</div><h2>나의 상위 강점 기어 상세</h2>
-    <p class="sub">가장 강하게 발달한 3가지 세부 강점(기어)을 자세히 설명합니다.</p>`;
+  h+=`<div class="card interp"><div class="eyebrow">My Top Gears</div><h2>나의 상위 강점 기어 3가지</h2>
+    <p class="sub">가장 강하게 발달한 3가지 세부 강점(기어)입니다.</p>`;
   topGears.forEach((g,idx)=>{
     const gm=GEAR_META[g.gear], gd=GEAR_DATA[g.gear], eng=gearToEngine(g.gear);
-    h+=`<div style="border:1px solid var(--border-subtle);border-radius:var(--r-lg);padding:16px;margin-bottom:12px;background:linear-gradient(160deg,#fff,${eng==='RED'?'var(--engine-red-bg)':eng==='YELLOW'?'var(--engine-yellow-bg)':eng==='GREEN'?'var(--engine-green-bg)':'var(--engine-blue-bg)'});">
+    const gbg=eng==='RED'?'var(--engine-red-bg)':eng==='YELLOW'?'var(--engine-yellow-bg)':eng==='GREEN'?'var(--engine-green-bg)':'var(--engine-blue-bg)';
+    h+=`<div style="border:1px solid var(--border-subtle);border-radius:var(--r-lg);padding:16px;margin-bottom:12px;background:linear-gradient(160deg,#fff,${gbg});">
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
         <div style="width:46px;height:46px;border-radius:13px;background:${gm.color};color:#fff;display:grid;place-items:center;font-weight:900;font-size:14px;flex-shrink:0;">${g.gear}</div>
         <div style="flex:1;">
@@ -1114,31 +1049,85 @@ function renderResult(){
     </div>`;
   });
   h+=`</div>`;
-  // 간단 설문 + 소감 + PDF
-  h+=`<div class="card no-print">
-    <div class="eyebrow">Survey & Reflection</div>
-    <h2>강점 활용 설문 & 소감</h2>
-    <p class="sub">아래 설문과 소감에 응해주시면 결과를 <b>PDF로 저장</b>할 수 있습니다. 통계는 익명으로 활용됩니다.</p>
-    ${surveyQ('q0','① 나는 지금 내 강점 컬러를 일·삶에서 잘 활용하고 있다')}
-    ${surveyQ('q1','② 진단 결과가 나와 잘 맞는다고 느꼈다')}
-    ${surveyQ('q2','③ 지금 나의 직업·직무에 만족한다')}
-    ${surveyQ('q3','④ 이 진단이 나를 이해하는 데 도움이 됐다')}
-    ${surveyQ('q4','⑤ 주변에 이 진단을 추천하고 싶다')}
-    <div class="field" style="margin-top:6px;"><label>소감 한마디</label>
-      <textarea id="r-feedback" placeholder="예: 내가 왜 그렇게 행동했는지 이해가 됐어요. 앞으로 강점을 이렇게 활용해보고 싶습니다..." oninput="onFeedback()"></textarea></div>
-    <div class="field">
-      <label>소감 별점</label>
-      <div id="star-row" style="font-size:30px;letter-spacing:4px;cursor:pointer;user-select:none;">
-        ${[1,2,3,4,5].map(n=>`<span onclick="setStar(${n})" data-star="${n}" style="color:#E3DFF0;">★</span>`).join('')}
+  // 5) 통합 상세 해석 (중복 제거, 같은 주제는 합쳐 더 상세하게)
+  const allJobs=[...ed.jobs, ...ex.jobsDetail];
+  const allStress=[...ed.stress, ...ex.workStress];
+  h+=`<div class="card interp">
+    <div class="eyebrow">Deep Interpretation</div>
+    <h2>${ed.name} — 상세 강점 해석</h2>
+    <div class="chips">${ed.tags.map(t=>`<span>${t}</span>`).join('')}</div>
+
+    <h3>💪 핵심 강점</h3><ul>${ed.strengths.map(s=>`<li>${s}</li>`).join('')}</ul>
+
+    <h3>💬 소통 스타일</h3>
+    <p class="para">${ed.communication}</p>
+    <p class="para" style="margin-top:8px;">${ex.commStyle}</p>
+
+    <h3>💼 이런 일·역할에서 빛납니다</h3><ul>${allJobs.map(s=>`<li>${s}</li>`).join('')}</ul>
+
+    <h3>😮‍💨 업무에서 스트레스를 받는 순간</h3><ul>${allStress.map(s=>`<li>${s}</li>`).join('')}</ul>
+    <p class="para" style="margin-top:8px;"><b style="color:var(--brand-purple)">대처법 &nbsp;</b>${ex.workCope}</p>
+
+    <h3>❤️ 대인관계에서의 나</h3>
+    <p class="para">${ed.romance}</p>
+    <p class="para" style="margin-top:8px;"><b style="color:var(--brand-purple)">불안한 순간 &nbsp;</b>${ex.relStress}</p>
+    <p class="para" style="margin-top:8px;"><b style="color:var(--brand-purple)">갈등할 때 &nbsp;</b>${ed.conflict}</p>
+    <p class="para" style="margin-top:8px;"><b style="color:var(--brand-purple)">관계를 지키는 법 &nbsp;</b>${ex.relCope}</p>
+    <p class="para" style="margin-top:8px;"><b style="color:var(--brand-purple)">다름을 보완으로 &nbsp;</b>${ex.interpersonal}</p>
+
+    <div class="combo-box" style="margin-top:14px;"><div class="clabel">🔑 나의 키맨(Key Man) 역할</div><p>${ex.keyman}</p></div>
+
+    <h3 style="margin-top:18px;">🌟 나를 움직이는 핵심 가치</h3>
+    ${ed.values.map(v=>`<div class="value-item"><div class="vt">${v.title}</div><div class="vd">${v.detail}</div><div class="vb">📖 ${v.basis}</div></div>`).join('')}
+
+    <h3>🌱 성장 포인트</h3>
+    ${ed.growth.map(v=>`<div class="value-item"><div class="vt">${v.title}</div><div class="vd">${v.detail}</div></div>`).join('')}
+
+    <h3>🌑 강점이 과할 때 (그림자)</h3><p class="para">${ex.shadow}</p>
+
+    <h3>🔋 회복·자기충전 방법</h3>
+    <div class="heal-grid">${ed.healing.map(hl=>`<div class="heal-item"><div class="hl">${hl.label}</div><div class="hd">${hl.desc}</div></div>`).join('')}</div>
+  </div>`;
+  // 6) 자기확언 (소감 바로 위)
+  h+=`<div class="card interp" style="background:linear-gradient(160deg,#fff,${bg});">
+    <div class="eyebrow">Affirmations</div>
+    <h2>나를 위한 자기확언</h2>
+    <p class="sub">오늘의 나에게 건네는 문장입니다. 소리 내어 한 번 읽어보세요.</p>
+    ${ed.affirmations.map(a=>`<div class="affirm"><span class="aq">"</span> ${a} <span class="aq">"</span></div>`).join('')}
+  </div>`;
+  // 7) 소감 & PDF (친근한 리빌형)
+  h+=`<div class="card no-print" style="text-align:center;background:var(--brand-gradient-soft);border:1px solid var(--border-default);">
+    <div style="font-size:38px;line-height:1;">💜</div>
+    <h2 style="margin-top:6px;">오늘 진단, 어떠셨나요?</h2>
+    <p class="sub" style="max-width:440px;margin:8px auto 2px;">짧은 소감 한 줄이면 충분해요. 소감을 남겨주시면 나의 결과를 <b>예쁜 PDF</b>로 받아볼 수 있어요 📄</p>
+    <div id="survey-cta">
+      <button class="btn btn-primary btn-lg" style="max-width:360px;margin:12px auto 0;" onclick="openSurvey()">✍️ 소감 쓰고 결과 PDF 받기</button>
+    </div>
+    <div id="survey-block" style="display:none;text-align:left;margin-top:20px;">
+      <div style="background:var(--bg-surface);border-radius:var(--r-lg);padding:18px;box-shadow:var(--shadow-sm);">
+        <p style="font-size:13px;font-weight:800;color:var(--brand-purple);margin-bottom:12px;">🎨 아주 잠깐이면 돼요 · 익명 통계로만 활용됩니다</p>
+        <div class="field">
+          <label>지금 나는 내 강점 컬러를 일·삶에서 얼마나 잘 쓰고 있을까요? &nbsp;<span id="sat-val" style="color:var(--brand-purple);font-weight:900;font-size:16px;">50</span>점</label>
+          <input id="r-sat" type="range" min="0" max="100" value="50" step="5" style="width:100%;accent-color:var(--brand-purple);" oninput="onSat()">
+          <div class="scale-legend"><span>😔 아직 잘 못 써요</span><span>잘 쓰고 있어요 😄</span></div>
+        </div>
+        ${surveyQ('q1','진단 결과가 나와 잘 맞았나요?')}
+        ${surveyQ('q2','지금 내 일·직무에 만족하나요?')}
+        ${surveyQ('q3','이 진단이 나를 이해하는 데 도움이 됐나요?')}
+        ${surveyQ('q4','주변에도 추천하고 싶은가요?')}
       </div>
-    </div>
-    <div class="field">
-      <label>사진 첨부 <span class="opt">(선택)</span></label>
-      <input id="r-image" type="file" accept="image/*" onchange="onImagePick(this)" style="font-size:13px;">
-      <div id="img-preview" style="margin-top:10px;"></div>
-    </div>
-    <div id="pdf-zone">
-      <div class="pdf-cta" id="pdf-hint">✍️ 만족도와 소감을 입력하면 PDF 저장 버튼이 활성화됩니다.</div>
+      <div class="field" style="margin-top:16px;"><label>💬 오늘 느낀 점, 한 줄 소감 <span class="req">*</span></label>
+        <textarea id="r-feedback" placeholder="예: 내가 왜 그렇게 행동했는지 이해가 됐어요. 앞으로 이런 강점을 더 살려보고 싶어요 :)" oninput="onFeedback()"></textarea></div>
+      <div class="field"><label>이 진단, 별점을 준다면?</label>
+        <div id="star-row" style="font-size:34px;letter-spacing:6px;cursor:pointer;user-select:none;">
+          ${[1,2,3,4,5].map(n=>`<span onclick="setStar(${n})" data-star="${n}" style="color:#E3DFF0;">★</span>`).join('')}
+        </div></div>
+      <div class="field"><label>📷 사진 첨부 <span class="opt">(선택 · 결과 PDF에 함께 담겨요)</span></label>
+        <input id="r-image" type="file" accept="image/*" onchange="onImagePick(this)" style="font-size:13px;">
+        <div id="img-preview" style="margin-top:10px;"></div></div>
+      <div id="pdf-zone">
+        <div class="pdf-cta" id="pdf-hint">✍️ 만족도를 움직이고 소감을 남기면 <b>PDF 받기</b> 버튼이 나타나요.</div>
+      </div>
     </div>
   </div>`;
   // 인쇄 전용 소감·이미지 블록
@@ -1165,7 +1154,7 @@ function renderResult(){
       </ul>
     </div>
   </div>`;
-  // 교육 문의
+  // 교육 문의 (이메일 · 카카오만)
   h+=`<div class="card no-print">
     <div class="eyebrow">Contact</div>
     <h2>교육·컨설팅 문의</h2>
@@ -1192,12 +1181,6 @@ function renderResult(){
       <a class="ch" href="http://pf.kakao.com/_xfdfbn" target="_blank" rel="noopener">
         <div class="ci" style="background:#FEE500;color:#3C1E1E">💬</div>
         <div><b>카카오톡 채널</b><span>@PBS</span></div></a>
-      <a class="ch" href="tel:01042857997">
-        <div class="ci" style="background:var(--engine-green)">📞</div>
-        <div><b>전화 문의</b><span>010-4285-7997</span></div></a>
-      <div class="ch" style="cursor:default">
-        <div class="ci" style="background:var(--brand-purple)">📍</div>
-        <div><b>오피스</b><span>울산 중구 종가6길 8-18 704호</span></div></div>
     </div>
   </div>`;
   h+=`<div class="no-print" style="text-align:center;padding:10px 0 30px;">
@@ -1213,7 +1196,8 @@ function surveyQ(id,label){
     <div class="scale-legend"><span>전혀 아니다</span><span>매우 그렇다</span></div></div>`;
 }
 const _survey={};
-function setSurvey(id,v,btn){ _survey[id]=v; if(id==='q0'){_satTouched=true;} const row=btn.parentElement; row.querySelectorAll('button').forEach(b=>{b.classList.remove('on');b.style.background='';}); btn.classList.add('on'); btn.style.background='var(--brand-purple)'; onFeedback(); }
+function setSurvey(id,v,btn){ _survey[id]=v; const row=btn.parentElement; row.querySelectorAll('button').forEach(b=>{b.classList.remove('on');b.style.background='';}); btn.classList.add('on'); btn.style.background='var(--brand-purple)'; onFeedback(); }
+function onSat(){ _satTouched=true; document.getElementById('sat-val').textContent=document.getElementById('r-sat').value; onFeedback(); }
 function setStar(n){ _star=n; document.querySelectorAll('#star-row span').forEach(s=>{ s.style.color = (+s.dataset.star<=n)?'#F5A623':'#E3DFF0'; }); }
 function onImagePick(input){
   const f=input.files&&input.files[0]; if(!f) return;
@@ -1227,19 +1211,24 @@ function onImagePick(input){
     }; img.src=e.target.result; };
   rd.readAsDataURL(f);
 }
+function openSurvey(){
+  const c=document.getElementById('survey-cta'); if(c) c.style.display='none';
+  const b=document.getElementById('survey-block'); if(b){ b.style.display='block'; try{b.scrollIntoView({behavior:'smooth',block:'start'});}catch(e){} }
+}
 function onFeedback(){
-  const v=document.getElementById('r-feedback').value.trim();
+  const fb=document.getElementById('r-feedback'); if(!fb) return;
+  const v=fb.value.trim();
   const zone=document.getElementById('pdf-zone');
   if(v.length>=5 && _satTouched){
-    zone.innerHTML=`<button class="btn btn-primary btn-lg" onclick="savePdf()">📄 결과를 PDF로 저장하기</button>
-      <p style="text-align:center;font-size:11px;color:var(--text-muted);margin-top:8px;">인쇄 창에서 "PDF로 저장"을 선택하세요.</p>`;
+    zone.innerHTML=`<button class="btn btn-primary btn-lg" onclick="savePdf()">📄 소감 보내고 결과 PDF 받기</button>
+      <p style="text-align:center;font-size:11px;color:var(--text-muted);margin-top:8px;">인쇄 창이 열리면 "PDF로 저장"을 선택하세요 · 소감·사진이 함께 담겨요</p>`;
   }else{
-    zone.innerHTML=`<div class="pdf-cta">✍️ ①번 문항을 선택하고 소감을 입력하면 PDF 저장이 활성화됩니다.</div>`;
+    zone.innerHTML=`<div class="pdf-cta">✍️ 만족도를 움직이고 소감을 남기면 <b>PDF 받기</b> 버튼이 나타나요.</div>`;
   }
 }
 function collectSurvey(){
-  STATE.survey={ satisfaction:_survey.q0?_survey.q0*20:null,
-    q0:_survey.q0||null,q1:_survey.q1||null,q2:_survey.q2||null,q3:_survey.q3||null,q4:_survey.q4||null };
+  STATE.survey={ satisfaction:parseInt(document.getElementById('r-sat').value),
+    q1:_survey.q1||null,q2:_survey.q2||null,q3:_survey.q3||null,q4:_survey.q4||null };
 }
 async function savePdf(){
   const v=document.getElementById('r-feedback').value.trim();
@@ -1250,7 +1239,7 @@ async function savePdf(){
   // 인쇄 전용 블록 채우기
   const pf=document.getElementById('print-feedback');
   if(pf){ pf.innerHTML=`<div class="card"><h2 style="font-size:16px;">나의 설문 & 소감</h2>
-    <p class="para" style="font-size:13px;">강점 활용: <b>${STATE.survey.q0||'-'} / 5</b> · 직무 만족: <b>${STATE.survey.q2||'-'} / 5</b></p>
+    <p class="para" style="font-size:13px;">강점 활용도: <b>${STATE.survey.satisfaction}/100</b></p>
     <p class="para" style="white-space:pre-wrap;">${esc(v)}</p>
     ${_sogaImg?`<img src="${_sogaImg}" style="max-width:100%;max-height:320px;border-radius:12px;margin-top:8px;">`:''}</div>`; }
   setTimeout(()=>window.print(),350);
@@ -1297,113 +1286,6 @@ function adminTab(t){
   document.querySelectorAll('.tabbar button').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));
   document.querySelectorAll('.admin-tab').forEach(el=>el.style.display='none');
   document.getElementById('tab-'+t).style.display='block';
-  if(t==='code') loadCodes();
-}
-
-/* ============================================================
-   강사코드 관리 (2단계: 발급·목록·사용량·비활성화)
-   ============================================================ */
-let CODES=null;
-async function loadCodes(force){
-  if(CODES&&!force){ renderCodes(); return; }
-  const zone=document.getElementById('tab-code');
-  zone.innerHTML='<div class="card">불러오는 중...</div>';
-  if(!DBREADY){ zone.innerHTML='<div class="card">Supabase 연결이 필요합니다.</div>'; return; }
-  try{
-    const {data,error}=await DB.rpc('admin_codes',{p_pw:ADMIN_PW,p_action:'list',p_payload:{}});
-    if(error) throw error;
-    if(!data.ok) throw new Error(data.message||'인증 실패');
-    CODES=data.codes||[];
-    renderCodes();
-  }catch(e){ zone.innerHTML='<div class="card">코드 목록을 불러오지 못했습니다: '+esc(e.message||'')+'</div>'; }
-}
-function renderCodes(){
-  let h=`<div class="card">
-    <h2 style="font-size:16px;">새 강사코드 발급</h2>
-    <div class="grid2" style="margin-top:10px;">
-      <div class="field"><label>강사 이름 <span class="req">*</span></label><input id="c-name" type="text" maxlength="20" placeholder="예: 홍길동"></div>
-      <div class="field"><label>연락처</label><input id="c-phone" type="text" maxlength="20" placeholder="010-0000-0000"></div>
-    </div>
-    <div class="grid2">
-      <div class="field"><label>이메일</label><input id="c-email" type="text" maxlength="60"></div>
-      <div class="field"><label>소속</label><input id="c-org" type="text" maxlength="40"></div>
-    </div>
-    <div class="grid2">
-      <div class="field"><label>사용 가능 인원</label><input id="c-max" type="number" value="100" min="1"></div>
-      <div class="field"><label>유효기간 (개월)</label><input id="c-months" type="number" value="1" min="1" max="24"></div>
-    </div>
-    <button class="btn btn-primary" onclick="issueCode()">코드 발급하기</button>
-    <div id="c-result" style="margin-top:12px;"></div>
-  </div>`;
-  h+=`<div class="card"><h2 style="font-size:16px;">발급된 코드 (${(CODES||[]).length})</h2>
-    <div style="overflow-x:auto;margin-top:10px;">
-    <table style="width:100%;border-collapse:collapse;font-size:12.5px;">
-      <tr style="border-bottom:2px solid var(--border-default);text-align:left;">
-        <th style="padding:6px 8px;">코드</th><th style="padding:6px 8px;">강사/기관</th>
-        <th style="padding:6px 8px;">사용</th><th style="padding:6px 8px;">이번달</th>
-        <th style="padding:6px 8px;">만료일</th><th style="padding:6px 8px;">상태</th><th style="padding:6px 8px;"></th>
-      </tr>`;
-  (CODES||[]).forEach(c=>{
-    const exp=(c.valid_until||'').slice(0,10);
-    const expired=c.valid_until&&new Date(c.valid_until)<new Date();
-    const st=!c.is_active?'<span style="color:#C0392B;font-weight:800;">정지</span>':(expired?'<span style="color:#B7950B;font-weight:800;">만료</span>':'<span style="color:#1E8449;font-weight:800;">활성</span>');
-    h+=`<tr style="border-bottom:1px solid var(--border-default);">
-      <td style="padding:6px 8px;font-weight:800;white-space:nowrap;">${esc(c.code)}</td>
-      <td style="padding:6px 8px;">${esc(c.instructor_name||c.org_name||'-')}</td>
-      <td style="padding:6px 8px;white-space:nowrap;">${c.used_count}/${c.max_uses}</td>
-      <td style="padding:6px 8px;">${c.month_uses||0}</td>
-      <td style="padding:6px 8px;white-space:nowrap;">${exp}</td>
-      <td style="padding:6px 8px;">${st}</td>
-      <td style="padding:6px 8px;white-space:nowrap;">
-        <button class="btn btn-ghost" style="padding:4px 10px;font-size:11.5px;" onclick="toggleCode('${c.id}',${c.is_active?'false':'true'})">${c.is_active?'정지':'재개'}</button>
-        <button class="btn btn-ghost" style="padding:4px 10px;font-size:11.5px;" onclick="showUsage('${c.id}','${esc(c.code)}')">월별</button>
-      </td></tr>`;
-  });
-  h+=`</table></div><div id="c-usage" style="margin-top:12px;"></div></div>`;
-  document.getElementById('tab-code').innerHTML=h;
-}
-async function issueCode(){
-  const name=document.getElementById('c-name').value.trim();
-  if(!name){ toast('강사 이름을 입력해주세요'); return; }
-  const payload={ instructor_name:name,
-    instructor_phone:document.getElementById('c-phone').value.trim(),
-    instructor_email:document.getElementById('c-email').value.trim(),
-    org_name:document.getElementById('c-org').value.trim(),
-    max_uses:parseInt(document.getElementById('c-max').value)||100,
-    valid_months:parseInt(document.getElementById('c-months').value)||1 };
-  try{
-    const {data,error}=await DB.rpc('admin_codes',{p_pw:ADMIN_PW,p_action:'issue',p_payload:payload});
-    if(error) throw error;
-    if(!data.ok) throw new Error(data.message||'발급 실패');
-    document.getElementById('c-result').innerHTML=
-      `<div style="background:var(--brand-purple);color:#fff;border-radius:12px;padding:16px;text-align:center;">
-        <div style="font-size:12px;opacity:.85;">발급 완료 — 강사에게 이 코드를 전달하세요</div>
-        <div style="font-size:26px;font-weight:900;letter-spacing:2px;margin-top:4px;">${esc(data.code)}</div>
-        <div style="font-size:11.5px;opacity:.85;margin-top:4px;">유효기간 ${(data.valid_until||'').slice(0,10)}까지 · ${data.max_uses}명</div>
-      </div>`;
-    loadCodes(true);
-  }catch(e){ toast('발급 실패: '+(e.message||'')); }
-}
-async function toggleCode(id,active){
-  try{
-    const {data,error}=await DB.rpc('admin_codes',{p_pw:ADMIN_PW,p_action:'toggle',p_payload:{code_id:id,active:active==='true'||active===true}});
-    if(error) throw error;
-    if(!data.ok) throw new Error(data.message||'');
-    toast(data.is_active?'코드가 재개되었습니다':'코드가 정지되었습니다');
-    loadCodes(true);
-  }catch(e){ toast('변경 실패: '+(e.message||'')); }
-}
-async function showUsage(id,code){
-  const zone=document.getElementById('c-usage');
-  zone.innerHTML='불러오는 중...';
-  try{
-    const {data,error}=await DB.rpc('admin_codes',{p_pw:ADMIN_PW,p_action:'usage',p_payload:{code_id:id}});
-    if(error) throw error;
-    const rows=(data.usage||[]).map(u=>`<tr><td style="padding:4px 8px;">${u.month}</td><td style="padding:4px 8px;font-weight:800;">${u.uses}건</td></tr>`).join('');
-    zone.innerHTML=`<div style="border:1px solid var(--border-default);border-radius:12px;padding:12px;">
-      <b style="font-size:13px;">${esc(code)} 월별 사용량 (정산 근거)</b>
-      <table style="margin-top:6px;font-size:12.5px;">${rows||'<tr><td style="padding:4px 8px;">사용 기록 없음</td></tr>'}</table></div>`;
-  }catch(e){ zone.innerHTML='사용량 조회 실패'; }
 }
 let ADMIN={records:[],inquiries:[],reviews:[]};
 async function loadAdminData(){
@@ -1586,5 +1468,4 @@ if(location.hash==='#admin'){ openAdmin(); }
 window.addEventListener('hashchange',()=>{ if(location.hash==='#admin') openAdmin(); });
 </script>
 </body>
-<!-- build: stage2 instructor codes -->
 </html>
