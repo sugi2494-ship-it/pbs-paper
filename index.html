@@ -41,7 +41,7 @@ body{font-family:var(--font);background:var(--bg-page);color:var(--text-primary)
 .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:15px;letter-spacing:-.01em;}
 .brand .dot{width:26px;height:26px;border-radius:8px;background:var(--brand-gradient);display:grid;place-items:center;color:#fff;font-size:13px;font-weight:900;}
 .brand small{display:block;font-size:10px;color:var(--text-muted);font-weight:600;letter-spacing:.02em;}
-.top a.admin-link{font-size:11px;color:var(--text-muted);text-decoration:none;padding:5px 10px;border-radius:var(--r-full);border:1px solid var(--border-default);}
+.admin-link{font-size:11px;color:var(--text-muted);text-decoration:none;padding:5px 12px;border-radius:var(--r-full);border:1px solid var(--border-default);}
 /* hero */
 .hero{background:var(--brand-gradient);color:#fff;border-radius:0 0 32px 32px;padding:44px 18px 52px;text-align:center;position:relative;overflow:hidden;}
 .hero::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 80% 10%,rgba(255,255,255,.14),transparent 40%);pointer-events:none;}
@@ -209,7 +209,6 @@ body{font-family:var(--font);background:var(--bg-page);color:var(--text-primary)
       <span class="dot">P</span>
       <span>PBS 컬러강점<small>현장진단 결과 · PBS COLOR LAB</small></span>
     </div>
-    <a class="admin-link" href="#admin" onclick="openAdmin();return false;">관리자</a>
   </div>
 </div>
 
@@ -371,9 +370,9 @@ body{font-family:var(--font);background:var(--bg-page);color:var(--text-primary)
 <div class="toast" id="toast"></div>
 
 <div class="foot">
-  <b>PBS COLOR LAB · 최해숙 대표</b><br>
+  <b>PBS COLOR LAB</b><br>
   컬러강점 진단지 저작권 C-2021-025229 · © 2025 주식회사 커넥트온브릿지<br>
-  칼 융 · 괴테 · 막스 뤼셔 · DISC 통합 컬러 퍼스널리티 진단
+  <a class="admin-link" href="#admin" onclick="openAdmin();return false;" style="display:inline-block;margin-top:12px;">관리자</a>
 </div>
 
 <script>
@@ -820,7 +819,7 @@ function buildQuiz(){
     ENGINE_GEARS[eng].forEach(gear=>{
       const gm=GEAR_META[gear], gd=GEAR_DATA[gear];
       html+=`<div class="gear-group">
-        <div class="gear-group-title"><span class="gtag" style="background:${gm.color}">${gear} ${gm.name}</span> ${gd.name}</div>`;
+        <div class="gear-group-title"><span class="gtag" style="background:${gm.color}">${gear}</span> ${gd.name}</div>`;
       QUESTIONS.filter(q=>q.gear===gear).forEach(q=>{
         html+=`<div class="q">
           <div class="q-text"><span class="q-num">${q.id}.</span><span>${q.text.replace(/</g,'&lt;')}${q.deep?'<span class="q-deep">심화</span>':''}</span></div>
@@ -870,7 +869,7 @@ function buildSummary(){
     ENGINE_GEARS[eng].forEach(g=>{
       const gm=GEAR_META[g], gd=GEAR_DATA[g];
       html+=`<div style="display:flex;align-items:center;gap:11px;padding:11px 0;border-bottom:1px dashed var(--border-subtle);">
-        <span class="gtag" style="background:${gm.color};color:#fff;font-size:11px;font-weight:900;padding:3px 9px;border-radius:999px;flex-shrink:0;">${g} ${gm.name}</span>
+        <span class="gtag" style="background:${gm.color};color:#fff;font-size:11px;font-weight:900;padding:3px 9px;border-radius:999px;flex-shrink:0;">${g}</span>
         <div style="flex:1;font-size:13px;font-weight:600;line-height:1.3;">${gd.name}</div>
         <input id="sum-${g}" type="number" min="0" max="25" inputmode="numeric" placeholder="0~25" oninput="updateSumProgress()" style="width:84px;text-align:center;font-size:16px;font-weight:800;padding:10px 6px;border:1.5px solid var(--border-default);border-radius:var(--r-md);font-family:var(--font);">
       </div>`;
@@ -1018,12 +1017,12 @@ function renderResult(){
     <div style="display:flex;gap:10px;margin:10px 0;flex-wrap:wrap;">
       <div style="flex:1;min-width:130px;background:var(--bg-muted);border-radius:var(--r-md);padding:14px;text-align:center;">
         <div style="font-size:11px;color:var(--text-muted);font-weight:800;">1위 기어</div>
-        <div style="font-size:18px;font-weight:900;color:${GEAR_META[r.top1.gear].color}">${r.top1.gear} ${GEAR_META[r.top1.gear].name}</div>
+        <div style="font-size:18px;font-weight:900;color:${GEAR_META[r.top1.gear].color}">${r.top1.gear}</div>
         <div style="font-size:12px;color:var(--text-secondary);">${GEAR_DATA[r.top1.gear].name} · ${r.top1.percent}%</div>
       </div>
       <div style="flex:1;min-width:130px;background:var(--bg-muted);border-radius:var(--r-md);padding:14px;text-align:center;">
         <div style="font-size:11px;color:var(--text-muted);font-weight:800;">2위 기어</div>
-        <div style="font-size:18px;font-weight:900;color:${GEAR_META[r.top2.gear].color}">${r.top2.gear} ${GEAR_META[r.top2.gear].name}</div>
+        <div style="font-size:18px;font-weight:900;color:${GEAR_META[r.top2.gear].color}">${r.top2.gear}</div>
         <div style="font-size:12px;color:var(--text-secondary);">${GEAR_DATA[r.top2.gear].name} · ${r.top2.percent}%</div>
       </div>
     </div>
@@ -1040,7 +1039,7 @@ function renderResult(){
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
         <div style="width:46px;height:46px;border-radius:13px;background:${gm.color};color:#fff;display:grid;place-items:center;font-weight:900;font-size:14px;flex-shrink:0;">${g.gear}</div>
         <div style="flex:1;">
-          <div style="font-size:11px;font-weight:800;color:var(--text-muted);">${idx+1}위 강점 · ${gm.name}</div>
+          <div style="font-size:11px;font-weight:800;color:var(--text-muted);">${idx+1}위 강점</div>
           <div style="font-size:17px;font-weight:900;letter-spacing:-.01em;">${gd.name}</div>
           <div style="font-size:12px;color:var(--text-secondary);font-weight:600;">${gd.tagline}</div>
         </div>
@@ -1343,6 +1342,7 @@ async function loadAdminData(){
 }
 function inqHandled(id){ try{ return (JSON.parse(localStorage.getItem('pbs-inq-handled')||'[]')).includes(id); }catch(e){ return false; } }
 function setInqHandled(id,on){ try{ let a=JSON.parse(localStorage.getItem('pbs-inq-handled')||'[]'); if(on){ if(!a.includes(id)) a.push(id);} else { a=a.filter(x=>x!==id);} localStorage.setItem('pbs-inq-handled',JSON.stringify(a)); }catch(e){} }
+function toggleStat(el){ const b=el.parentElement.querySelector('.stat-body'); if(!b) return; const open=b.style.display!=='none'; b.style.display=open?'none':'block'; const ar=el.querySelector('.stat-arrow'); if(ar) ar.textContent=open?'▸':'▾'; }
 function renderStat(){
   const recs=ADMIN.records;
   const total=recs.length;
@@ -1368,13 +1368,13 @@ function renderStat(){
       <div style="width:40px;text-align:right;font-weight:800;">${pct}%</div></div>`;
   });
   h+=`</div></div>`;
-  h+=`<div class="card"><h2 style="font-size:16px;">연령대 분포</h2><div style="margin-top:12px;">`;
+  h+=`<div class="card"><h2 style="font-size:16px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;" onclick="toggleStat(this)">연령대 분포 <span class="stat-arrow">▸</span></h2><div class="stat-body" style="display:none;margin-top:12px;">`;
   const amax=Math.max(1,...Object.values(ages));
   Object.entries(ages).sort((a,b)=>b[1]-a[1]).forEach(([k,v])=>{
     h+=`<div class="dist-row"><div class="dl">${k}</div><div class="dist-track"><div class="dist-fill" style="width:${Math.max(v/amax*100,6)}%;background:var(--brand-purple)">${v}</div></div></div>`;
   });
   h+=`</div></div>`;
-  h+=`<div class="card"><h2 style="font-size:16px;">소속·직업 분포 (상위 12)</h2><div style="margin-top:12px;">`;
+  h+=`<div class="card"><h2 style="font-size:16px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;" onclick="toggleStat(this)">소속·직업 분포 (상위 12) <span class="stat-arrow">▸</span></h2><div class="stat-body" style="display:none;margin-top:12px;">`;
   const jsorted=Object.entries(jobs).filter(([k])=>k!=='미상').sort((a,b)=>b[1]-a[1]).slice(0,12);
   const jmax=Math.max(1,...jsorted.map(x=>x[1]));
   if(jsorted.length===0) h+='<p style="font-size:13px;color:var(--text-muted)">데이터 없음</p>';
@@ -1385,8 +1385,8 @@ function renderStat(){
   // ---- 직업군별 대표 엔진 분포 ----
   const jgMap={};
   recs.forEach(r=>{ const jg=(r.scores&&r.scores.job_group)||'미분류'; const e=r.top_engine; if(!jgMap[jg]) jgMap[jg]={RED:0,YELLOW:0,GREEN:0,BLUE:0,_n:0}; if(e&&jgMap[jg][e]!==undefined){jgMap[jg][e]++;jgMap[jg]._n++;} });
-  h+=`<div class="card"><h2 style="font-size:16px;">직업군별 컬러 엔진 분포</h2>
-    <p style="font-size:11px;color:var(--text-muted);margin:4px 0 12px;">각 직업군에서 어떤 컬러 엔진이 많은지 (막대=대표엔진 인원)</p>`;
+  h+=`<div class="card"><h2 style="font-size:16px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;" onclick="toggleStat(this)">직업군별 컬러 엔진 분포 <span class="stat-arrow">▸</span></h2>
+    <div class="stat-body" style="display:none;"><p style="font-size:11px;color:var(--text-muted);margin:4px 0 12px;">각 직업군에서 어떤 컬러 엔진이 많은지 (막대=대표엔진 인원)</p>`;
   const jgKeys=Object.keys(jgMap).filter(k=>jgMap[k]._n>0).sort((a,b)=>jgMap[b]._n-jgMap[a]._n);
   if(!jgKeys.length) h+='<p style="font-size:13px;color:var(--text-muted)">데이터 없음</p>';
   jgKeys.forEach(jg=>{
@@ -1396,7 +1396,7 @@ function renderStat(){
     ['RED','YELLOW','GREEN','BLUE'].forEach(e=>{ const w=m._n?m[e]/m._n*100:0; if(w>0) h+=`<div style="width:${w}%;background:${ENGINE_HEX[e]}" title="${e} ${m[e]}"></div>`; });
     h+=`</div></div>`;
   });
-  h+=`</div>`;
+  h+=`</div></div>`;
   // ---- 강점 활용 만족도(0~100) 통계 ----
   const sats=recs.filter(r=>r.scores&&r.scores.satisfaction!=null);
   if(sats.length){
