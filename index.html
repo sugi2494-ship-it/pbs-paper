@@ -707,6 +707,8 @@ async function saveRecord(){
   scores.diag_date=u.diagDate||null; scores.entry_mode=STATE.mode||'paper';
   scores.job_group=u.jobGroup||null;
   scores.survey=STATE.survey||null;
+  scores.marketing_email=(STATE.survey&&STATE.survey.marketingEmail)||null;
+  scores.marketing_consent=!!(STATE.survey&&STATE.survey.marketingConsent);
   scores.satisfaction=(STATE.survey&&STATE.survey.satisfaction!=null)?STATE.survey.satisfaction:null;
   const ageNum=parseInt((u.age||'').replace(/[^0-9]/g,''))||null;
   const payload={
@@ -1116,18 +1118,25 @@ function renderResult(){
         ${surveyQ('q3','이 진단이 나를 이해하는 데 도움이 됐나요?')}
         ${surveyQ('q4','주변에도 추천하고 싶은가요?')}
       </div>
-      <div class="field" style="margin-top:16px;"><label>💬 오늘 느낀 점, 한 줄 소감 <span class="req">*</span></label>
-        <textarea id="r-feedback" placeholder="예: 내가 왜 그렇게 행동했는지 이해가 됐어요. 앞으로 이런 강점을 더 살려보고 싶어요 :)" oninput="onFeedback()"></textarea></div>
-      <div class="field"><label>이 진단, 별점을 준다면?</label>
+      <div class="field" style="margin-top:16px;"><label>⭐ 이 진단, 별점을 준다면? <span class="req">*</span></label>
         <div id="star-row" style="font-size:34px;letter-spacing:6px;cursor:pointer;user-select:none;">
           ${[1,2,3,4,5].map(n=>`<span onclick="setStar(${n})" data-star="${n}" style="color:#E3DFF0;">★</span>`).join('')}
         </div></div>
+      <div class="field"><label>💬 오늘 나에 대해 알게 된 점이나 느낀 점, 도움이 된 부분은 어떤 부분인가요? <span class="req">*</span></label>
+        <textarea id="r-feedback" placeholder="예: 내가 왜 그렇게 행동했는지 이해가 됐어요. OO 부분이 특히 도움이 됐고, 앞으로 이런 강점을 더 살려보고 싶어요 :)"></textarea></div>
       <div class="field"><label>📷 사진 첨부 <span class="opt">(선택 · 결과 PDF에 함께 담겨요)</span></label>
         <input id="r-image" type="file" accept="image/*" onchange="onImagePick(this)" style="font-size:13px;">
         <div id="img-preview" style="margin-top:10px;"></div></div>
-      <div id="pdf-zone">
-        <div class="pdf-cta" id="pdf-hint">✍️ 만족도를 움직이고 소감을 남기면 <b>PDF 받기</b> 버튼이 나타나요.</div>
+      <div class="field" style="background:var(--bg-muted);border-radius:var(--r-md);padding:14px;">
+        <label style="font-size:13px;">📩 향후 PBS 컬러랩의 <b>업데이트 자료·소식</b>을 받아보고 싶다면 이메일을 남겨주세요 <span class="opt">(선택)</span></label>
+        <input id="r-email2" type="email" placeholder="이메일 주소" maxlength="60" style="margin-top:6px;">
+        <label style="display:flex;gap:8px;align-items:flex-start;font-size:12px;color:var(--text-secondary);margin-top:9px;cursor:pointer;">
+          <input id="r-consent2" type="checkbox" style="width:auto;margin-top:2px;flex-shrink:0;">
+          <span>PBS 컬러랩의 자료·소식 수신에 동의합니다.</span></label>
       </div>
+      <button class="btn btn-primary btn-lg" style="margin-top:8px;" onclick="submitSoga()">💜 소감 제출하고 결과 PDF 받기</button>
+      <p style="text-align:center;font-size:11px;color:var(--text-muted);margin-top:8px;">별점과 소감을 남기면 결과가 PDF로 저장됩니다</p>
+      <div id="thanks" style="display:none;"></div>
     </div>
   </div>`;
   // 인쇄 전용 소감·이미지 블록
@@ -1196,8 +1205,8 @@ function surveyQ(id,label){
     <div class="scale-legend"><span>전혀 아니다</span><span>매우 그렇다</span></div></div>`;
 }
 const _survey={};
-function setSurvey(id,v,btn){ _survey[id]=v; const row=btn.parentElement; row.querySelectorAll('button').forEach(b=>{b.classList.remove('on');b.style.background='';}); btn.classList.add('on'); btn.style.background='var(--brand-purple)'; onFeedback(); }
-function onSat(){ _satTouched=true; document.getElementById('sat-val').textContent=document.getElementById('r-sat').value; onFeedback(); }
+function setSurvey(id,v,btn){ _survey[id]=v; const row=btn.parentElement; row.querySelectorAll('button').forEach(b=>{b.classList.remove('on');b.style.background='';}); btn.classList.add('on'); btn.style.background='var(--brand-purple)'; }
+function onSat(){ _satTouched=true; document.getElementById('sat-val').textContent=document.getElementById('r-sat').value; }
 function setStar(n){ _star=n; document.querySelectorAll('#star-row span').forEach(s=>{ s.style.color = (+s.dataset.star<=n)?'#F5A623':'#E3DFF0'; }); }
 function onImagePick(input){
   const f=input.files&&input.files[0]; if(!f) return;
@@ -1218,7 +1227,7 @@ function openSurvey(){
 function onFeedback(){
   const fb=document.getElementById('r-feedback'); if(!fb) return;
   const v=fb.value.trim();
-  const zone=document.getElementById('pdf-zone');
+  const zone=document.getElementById('pdf-zone'); if(!zone) return;
   if(v.length>=5 && _satTouched){
     zone.innerHTML=`<button class="btn btn-primary btn-lg" onclick="savePdf()">📄 소감 보내고 결과 PDF 받기</button>
       <p style="text-align:center;font-size:11px;color:var(--text-muted);margin-top:8px;">인쇄 창이 열리면 "PDF로 저장"을 선택하세요 · 소감·사진이 함께 담겨요</p>`;
@@ -1227,8 +1236,36 @@ function onFeedback(){
   }
 }
 function collectSurvey(){
+  const em=document.getElementById('r-email2'), cs=document.getElementById('r-consent2');
   STATE.survey={ satisfaction:parseInt(document.getElementById('r-sat').value),
-    q1:_survey.q1||null,q2:_survey.q2||null,q3:_survey.q3||null,q4:_survey.q4||null };
+    q1:_survey.q1||null,q2:_survey.q2||null,q3:_survey.q3||null,q4:_survey.q4||null,
+    marketingEmail:em?em.value.trim():'', marketingConsent:cs?!!cs.checked:false };
+}
+async function submitSoga(){
+  const fb=document.getElementById('r-feedback'); const v=(fb?fb.value:'').trim();
+  if(!_star){ toast('별점을 먼저 선택해주세요'); const sr=document.getElementById('star-row'); if(sr) sr.scrollIntoView({behavior:'smooth',block:'center'}); return; }
+  if(v.length<3){ toast('소감을 한 줄 남겨주세요'); if(fb) fb.focus(); return; }
+  collectSurvey();
+  await saveRecord();
+  if(!_fbSaved){ _fbSaved=true; await saveReview(v,_star||5,_sogaImg); }
+  const pf=document.getElementById('print-feedback');
+  if(pf){ pf.innerHTML=`<div class="card"><h2 style="font-size:16px;">나의 설문 & 소감</h2>
+    <p class="para" style="font-size:13px;">강점 활용도: <b>${STATE.survey.satisfaction}/100</b> · 별점 ${'★'.repeat(_star||5)}</p>
+    <p class="para" style="white-space:pre-wrap;">${esc(v)}</p>
+    ${_sogaImg?`<img src="${_sogaImg}" style="max-width:100%;max-height:320px;border-radius:12px;margin-top:8px;">`:''}</div>`; }
+  const inner=document.getElementById('survey-block');
+  const th=document.getElementById('thanks');
+  document.querySelectorAll('#survey-block .field, #survey-block > div[style*="background"]').forEach(el=>{ if(el.id!=='thanks') el.style.display='none'; });
+  if(th){ th.style.display='block'; th.innerHTML=`<div style="text-align:center;padding:20px 10px;">
+      <div style="font-size:44px;line-height:1;">💜</div>
+      <h2 style="margin-top:8px;">PBS 컬러와 함께 해주셔서<br>감사합니다!</h2>
+      <p class="sub" style="margin:10px auto;max-width:400px;">소중한 소감이 저장되었어요.${STATE.survey.marketingEmail?' 업데이트 자료도 이메일로 보내드릴게요 📩':''}<br>잠시 후 결과 PDF 저장 창이 열립니다 📄</p>
+      <button class="btn btn-primary btn-lg" style="max-width:320px;margin-top:6px;" onclick="window.print()">📄 결과 PDF 저장하기</button>
+    </div>`;
+    try{ th.scrollIntoView({behavior:'smooth',block:'center'}); }catch(e){}
+  }
+  toast('소감이 제출되었습니다. 감사합니다!');
+  setTimeout(()=>{ try{window.print();}catch(e){} },800);
 }
 async function savePdf(){
   const v=document.getElementById('r-feedback').value.trim();
@@ -1451,11 +1488,11 @@ async function delRev(id){
   ADMIN.reviews=ADMIN.reviews.filter(x=>x.id!==id); renderRev(); toast('삭제되었습니다');
 }
 function exportCsv(){
-  const rows=[['입력일시','진단날짜','직업군','이름','연령','소속','연락처','이메일','대표엔진','1위기어','강점활용도','설문공감','직무만족','자기이해','추천의향',...ALL_GEARS]];
+  const rows=[['입력일시','진단날짜','직업군','이름','연령','소속','연락처','이메일','자료수신이메일','대표엔진','1위기어','강점활용도','설문공감','직무만족','자기이해','추천의향',...ALL_GEARS]];
   ADMIN.records.forEach(r=>{
     const g=(r.scores&&r.scores.gears)||{}; const sc=r.scores||{}; const sv=sc.survey||{};
     const dd=sc.diag_date||''; const jg=sc.job_group||'';
-    rows.push([fmtDate(r.created_at),dd,jg,r.user_name||'',r.user_age||'',r.user_job||'',r.user_phone||'',r.user_email||'',r.top_engine||'',r.top_gear||'',sc.satisfaction!=null?sc.satisfaction:'',sv.q1||'',sv.q2||'',sv.q3||'',sv.q4||'',...ALL_GEARS.map(k=>g[k]!=null?g[k]:'')]);
+    rows.push([fmtDate(r.created_at),dd,jg,r.user_name||'',r.user_age||'',r.user_job||'',r.user_phone||'',r.user_email||'',sc.marketing_email||'',r.top_engine||'',r.top_gear||'',sc.satisfaction!=null?sc.satisfaction:'',sv.q1||'',sv.q2||'',sv.q3||'',sv.q4||'',...ALL_GEARS.map(k=>g[k]!=null?g[k]:'')]);
   });
   const csv='﻿'+rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
   const blob=new Blob([csv],{type:'text/csv'}); const url=URL.createObjectURL(blob);
