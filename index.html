@@ -56,13 +56,13 @@ body{font-family:var(--font);background:var(--bg-page);color:var(--text-primary)
 .btn-lg{width:100%;padding:17px;font-size:17px;}
 .btn-ghost{background:var(--bg-surface);color:var(--brand-purple);border:1.5px solid var(--border-strong);}
 .btn-white{background:#fff;color:var(--brand-indigo);box-shadow:var(--shadow-md);margin-top:26px;}
-.section{padding:32px 0;}
-.card{background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--r-xl);box-shadow:var(--shadow-md);padding:26px 22px;margin-bottom:18px;}
+.section{padding:22px 0;}
+.card{background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--r-xl);box-shadow:var(--shadow-md);padding:20px 18px;margin-bottom:13px;}
 .card h2{font-size:20px;font-weight:900;letter-spacing:-.02em;margin-bottom:6px;}
-.card .sub{color:var(--text-secondary);font-size:14px;margin-bottom:20px;}
+.card .sub{color:var(--text-secondary);font-size:14px;margin-bottom:14px;}
 .eyebrow{font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--brand-purple);margin-bottom:8px;}
 /* form */
-.field{margin-bottom:16px;}
+.field{margin-bottom:12px;}
 .field label{display:block;font-size:13px;font-weight:700;margin-bottom:7px;color:var(--text-primary);}
 .field label .req{color:var(--engine-red);}
 .field label .opt{color:var(--text-muted);font-weight:600;font-size:11px;}
@@ -111,7 +111,7 @@ body{font-family:var(--font);background:var(--bg-page);color:var(--text-primary)
 .combo-box{background:var(--brand-gradient-soft);border:1px solid var(--border-default);border-radius:var(--r-lg);padding:18px;margin-top:8px;}
 .combo-box .clabel{font-weight:900;font-size:16px;margin-bottom:6px;color:var(--brand-indigo);}
 .combo-box p{font-size:14px;color:var(--text-secondary);}
-.interp h3{font-size:16px;font-weight:900;margin:22px 0 10px;padding-left:12px;border-left:4px solid var(--brand-purple);letter-spacing:-.01em;}
+.interp h3{font-size:16px;font-weight:900;margin:16px 0 8px;padding-left:12px;border-left:4px solid var(--brand-purple);letter-spacing:-.01em;}
 .interp ul{list-style:none;}
 .interp li{position:relative;padding:7px 0 7px 24px;font-size:14px;color:var(--text-secondary);border-bottom:1px dashed var(--border-subtle);}
 .interp li::before{content:"";position:absolute;left:4px;top:15px;width:7px;height:7px;border-radius:50%;background:var(--brand-purple);}
@@ -1010,6 +1010,11 @@ function renderResult(){
   const dd=u.diagDate?new Date(u.diagDate).toLocaleDateString('ko-KR',{year:'numeric',month:'long',day:'numeric'}):new Date().toLocaleDateString('ko-KR',{year:'numeric',month:'long',day:'numeric'});
   const modeLabel=STATE.mode==='online'?'온라인 진단':'종이진단';
   let h='';
+  // PDF 전용 레포트 표지 제목
+  h+=`<div class="print-only" style="text-align:center;padding:2px 0 12px;border-bottom:2px solid var(--brand-purple);margin-bottom:12px;">
+    <div style="font-size:22px;font-weight:900;color:var(--brand-indigo);letter-spacing:-.02em;">${u.name?esc(u.name)+' 님':'나'}의 컬러강점 진단 결과 레포트</div>
+    <div style="font-size:12px;color:var(--text-muted);margin-top:4px;">PBS COLOR LAB · 진단일 ${dd}</div>
+  </div>`;
   // 1) hero
   h+=`<div class="card" style="text-align:center;background:linear-gradient(160deg,#fff,${bg});">
     <div class="result-hero" style="padding-top:6px;">
@@ -1122,11 +1127,7 @@ function renderResult(){
     <div id="survey-block" style="display:none;text-align:left;margin-top:20px;">
       <div style="background:var(--bg-surface);border-radius:var(--r-lg);padding:18px;box-shadow:var(--shadow-sm);">
         <p style="font-size:13px;font-weight:800;color:var(--brand-purple);margin-bottom:12px;">🎨 아주 잠깐이면 돼요 · 익명 통계로만 활용됩니다</p>
-        <div class="field">
-          <label>지금 나는 내 강점 컬러를 일·삶에서 얼마나 잘 쓰고 있을까요? &nbsp;<span id="sat-val" style="color:var(--brand-purple);font-weight:900;font-size:16px;">50</span>점</label>
-          <input id="r-sat" type="range" min="0" max="100" value="50" step="5" style="width:100%;accent-color:var(--brand-purple);" oninput="onSat()">
-          <div class="scale-legend"><span>😔 아직 잘 못 써요</span><span>잘 쓰고 있어요 😄</span></div>
-        </div>
+        ${surveyQ('sat','지금 나는 내 강점 컬러를 일·삶에서 잘 활용하고 있다')}
         ${surveyQ('q1','진단 결과가 나와 잘 맞았나요?')}
         ${surveyQ('q2','지금 내 일·직무에 만족하나요?')}
         ${surveyQ('q3','이 진단이 나를 이해하는 데 도움이 됐나요?')}
@@ -1251,13 +1252,14 @@ function onFeedback(){
 }
 function collectSurvey(){
   const em=document.getElementById('r-email2'), cs=document.getElementById('r-consent2');
-  STATE.survey={ satisfaction:parseInt(document.getElementById('r-sat').value),
+  STATE.survey={ satisfaction:(_survey.sat?_survey.sat*20:null),
     q1:_survey.q1||null,q2:_survey.q2||null,q3:_survey.q3||null,q4:_survey.q4||null,
     marketingEmail:em?em.value.trim():'', marketingConsent:cs?!!cs.checked:false };
 }
 async function submitSoga(){
   const fb=document.getElementById('r-feedback'); const v=(fb?fb.value:'').trim();
   if(!_star){ toast('별점을 먼저 선택해주세요'); const sr=document.getElementById('star-row'); if(sr) sr.scrollIntoView({behavior:'smooth',block:'center'}); return; }
+  if(!_survey.sat){ toast('첫 번째 문항(강점 활용도)에 답해주세요'); return; }
   if(v.length<3){ toast('소감을 한 줄 남겨주세요'); if(fb) fb.focus(); return; }
   collectSurvey();
   await saveRecord();
