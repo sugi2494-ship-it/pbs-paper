@@ -263,10 +263,10 @@ body{font-family:var(--font);background:var(--bg-page);color:var(--text-primary)
         <label>직업군 <span class="req">*</span></label>
         <select id="f-jobgroup">
           <option value="">선택하세요</option>
-          <option>경영·관리직</option><option>영업·마케팅</option><option>기획·사무</option>
-          <option>교육·강사</option><option>상담·복지</option><option>IT·개발</option>
-          <option>연구·기술</option><option>의료·보건</option><option>예술·디자인</option>
-          <option>서비스·판매</option><option>학생</option><option>기타</option>
+          <option value="mgmt">경영·관리</option><option value="sales_mkt">영업·마케팅</option><option value="office_admin">사무·행정</option>
+          <option value="edu">교육·강의</option><option value="counsel_welfare">상담·복지</option><option value="it_tech">IT·기술·연구</option>
+          <option value="medical">의료·보건</option><option value="art_design">예술·디자인</option><option value="service_retail">서비스·판매</option>
+          <option value="production">생산·현장</option><option value="student">학생</option><option value="homemaker_etc">주부·기타</option>
         </select>
       </div>
       <div class="grid2">
@@ -290,7 +290,11 @@ body{font-family:var(--font);background:var(--bg-page);color:var(--text-primary)
       </div>
       <label style="display:flex;gap:9px;align-items:flex-start;font-size:12.5px;color:var(--text-secondary);cursor:pointer;margin-top:4px;">
         <input id="f-consent" type="checkbox" style="width:auto;margin-top:3px;flex-shrink:0;">
-        <span>강의 개선 및 통계 목적의 데이터 수집·활용에 동의합니다. (개인정보는 통계 외 용도로 사용되지 않습니다.)</span>
+        <span>입력하신 정보와 진단 결과는 <b>개인을 식별할 수 없는 통계 형태</b>로 연구, 교육 콘텐츠, 도서·보도자료 제작에 활용될 수 있습니다. 이에 동의합니다.</span>
+      </label>
+      <label style="display:flex;gap:9px;align-items:flex-start;font-size:12.5px;color:var(--text-secondary);cursor:pointer;margin-top:8px;">
+        <input id="f-mkconsent" type="checkbox" style="width:auto;margin-top:3px;flex-shrink:0;">
+        <span>(선택) PBS COLOR LAB의 진단 리포트와 교육 소식을 이메일로 받는 것에 동의합니다.</span>
       </label>
       <button class="btn btn-primary btn-lg" style="margin-top:20px;" id="info-next" onclick="goQuiz()">다음 →</button>
     </div>
@@ -679,6 +683,8 @@ const ENGINE_EXTRA = {
 };
 const ADMIN_PW = '8808';
 const TEST_TYPE = 'paper_60';
+const ENTRY_PATH = 'paper_qr';
+const AGE_BAND = {'10대':'10s','20대':'20s','30대':'30s','40대':'40s','50대':'50s','60대 이상':'60s+'};
 
 const STATE = { answers:{}, user:{}, result:null, recordId:null, startTs:Date.now() };
 
@@ -698,14 +704,14 @@ let DB=null, DBREADY=false;
 })();
 
 async function saveRecord(){
-  if(STATE._saved) return {ok:true,id:STATE.recordId};
+  if(STATE._saved) return updateRecordSurvey();
   STATE._saved=true;
   const r=STATE.result, u=STATE.user;
   const scores={engines:{},gears:{}};
   Object.keys(r.engineScores).forEach(e=>scores.engines[e]=r.engineScores[e].percent);
   ALL_GEARS.forEach(g=>scores.gears[g]=r.gearScores[g].percent);
   scores.diag_date=u.diagDate||null; scores.entry_mode=STATE.mode||'paper';
-  scores.job_group=u.jobGroup||null;
+  scores.job_group=u.jobGroupLabel||u.jobGroup||null;
   scores.survey=STATE.survey||null;
   scores.satisfaction=(STATE.survey&&STATE.survey.satisfaction!=null)?STATE.survey.satisfaction:null;
   const ageNum=parseInt((u.age||'').replace(/[^0-9]/g,''))||null;
@@ -714,6 +720,10 @@ async function saveRecord(){
     user_name:u.name||null, user_age:ageNum, user_gender:null,
     user_org:u.job||null, user_email:u.email||null, user_phone:u.phone||null, user_job:u.job||null,
     inst_name:'최해숙', inst_org:'PBS COLOR LAB', user_consent:!!u.consent,
+    entry_path:ENTRY_PATH, job_group:u.jobGroup||null,
+    age_band:AGE_BAND[u.age]||null,
+    job_satisfaction:(STATE.survey&&STATE.survey.q2)||null,
+    marketing_consent:!!u.mkConsent,
     answers: (STATE.mode==='online' ? STATE.answers : {gear_sums:STATE.summaryGears||{}}), scores:scores,
     top_engine:r.mainEngine, top_gear:r.top1.gear, second_engine:r.rankedEngines[1]?.engine||null,
     duration_sec:Math.max(1,Math.round((Date.now()-STATE.startTs)/1000)),
@@ -728,6 +738,24 @@ async function saveRecord(){
     STATE.recordId=data?.id;
     return {ok:true,id:data?.id};
   }catch(e){ console.warn('[PBS] 기록 저장 실패',e); return {ok:false,error:e.message}; }
+}
+async function updateRecordSurvey(){
+  if(!DBREADY||!STATE.recordId||!STATE.survey) return {ok:true,id:STATE.recordId};
+  try{
+    const r=STATE.result,u=STATE.user;
+    const scores={engines:{},gears:{}};
+    Object.keys(r.engineScores).forEach(e=>scores.engines[e]=r.engineScores[e].percent);
+    ALL_GEARS.forEach(g=>scores.gears[g]=r.gearScores[g].percent);
+    scores.diag_date=u.diagDate||null; scores.entry_mode=STATE.mode||'paper';
+    scores.job_group=u.jobGroupLabel||u.jobGroup||null;
+    scores.survey=STATE.survey||null;
+    scores.satisfaction=(STATE.survey&&STATE.survey.satisfaction!=null)?STATE.survey.satisfaction:null;
+    const {error}=await DB.from('pbs_records').update({
+      scores:scores, job_satisfaction:(STATE.survey&&STATE.survey.q2)||null
+    }).eq('id',STATE.recordId);
+    if(error) throw error;
+    return {ok:true,id:STATE.recordId};
+  }catch(e){ console.warn('[PBS] 설문 업데이트 실패',e); return {ok:false}; }
 }
 async function saveReview(text,stars,imgDataUrl){
   if(!DBREADY) return {ok:false};
@@ -782,6 +810,8 @@ function goQuiz(){
   STATE.user={
     name:document.getElementById('f-name').value.trim(),
     job:job, jobGroup:jobGroup,
+    jobGroupLabel:(document.getElementById('f-jobgroup').selectedOptions[0]||{}).text||jobGroup,
+    mkConsent:document.getElementById('f-mkconsent')?document.getElementById('f-mkconsent').checked:false,
     age:age,
     diagDate:document.getElementById('f-date').value||new Date().toISOString().slice(0,10),
     email:isEmail?contact:'',
@@ -1087,10 +1117,7 @@ function renderResult(){
     <div class="eyebrow">Survey & Reflection</div>
     <h2>강점 활용 설문 & 소감</h2>
     <p class="sub">아래 설문과 소감에 응해주시면 결과를 <b>PDF로 저장</b>할 수 있습니다. 통계는 익명으로 활용됩니다.</p>
-    <div class="field">
-      <label>① 나는 지금 내 강점 컬러를 일·삶에서 잘 활용하고 있다 <span id="sat-val" style="color:var(--brand-purple);font-weight:900;">50</span> / 100</label>
-      <input id="r-sat" type="range" min="0" max="100" value="50" step="5" style="width:100%;accent-color:var(--brand-purple);" oninput="onSat()">
-    </div>
+    ${surveyQ('q0','① 나는 지금 내 강점 컬러를 일·삶에서 잘 활용하고 있다')}
     ${surveyQ('q1','② 진단 결과가 나와 잘 맞는다고 느꼈다')}
     ${surveyQ('q2','③ 지금 나의 직업·직무에 만족한다')}
     ${surveyQ('q3','④ 이 진단이 나를 이해하는 데 도움이 됐다')}
@@ -1184,8 +1211,7 @@ function surveyQ(id,label){
     <div class="scale-legend"><span>전혀 아니다</span><span>매우 그렇다</span></div></div>`;
 }
 const _survey={};
-function setSurvey(id,v,btn){ _survey[id]=v; const row=btn.parentElement; row.querySelectorAll('button').forEach(b=>{b.classList.remove('on');b.style.background='';}); btn.classList.add('on'); btn.style.background='var(--brand-purple)'; onFeedback(); }
-function onSat(){ _satTouched=true; document.getElementById('sat-val').textContent=document.getElementById('r-sat').value; onFeedback(); }
+function setSurvey(id,v,btn){ _survey[id]=v; if(id==='q0'){_satTouched=true;} const row=btn.parentElement; row.querySelectorAll('button').forEach(b=>{b.classList.remove('on');b.style.background='';}); btn.classList.add('on'); btn.style.background='var(--brand-purple)'; onFeedback(); }
 function setStar(n){ _star=n; document.querySelectorAll('#star-row span').forEach(s=>{ s.style.color = (+s.dataset.star<=n)?'#F5A623':'#E3DFF0'; }); }
 function onImagePick(input){
   const f=input.files&&input.files[0]; if(!f) return;
@@ -1206,12 +1232,12 @@ function onFeedback(){
     zone.innerHTML=`<button class="btn btn-primary btn-lg" onclick="savePdf()">📄 결과를 PDF로 저장하기</button>
       <p style="text-align:center;font-size:11px;color:var(--text-muted);margin-top:8px;">인쇄 창에서 "PDF로 저장"을 선택하세요.</p>`;
   }else{
-    zone.innerHTML=`<div class="pdf-cta">✍️ 만족도(①)를 조정하고 소감을 입력하면 PDF 저장이 활성화됩니다.</div>`;
+    zone.innerHTML=`<div class="pdf-cta">✍️ ①번 문항을 선택하고 소감을 입력하면 PDF 저장이 활성화됩니다.</div>`;
   }
 }
 function collectSurvey(){
-  STATE.survey={ satisfaction:parseInt(document.getElementById('r-sat').value),
-    q1:_survey.q1||null,q2:_survey.q2||null,q3:_survey.q3||null,q4:_survey.q4||null };
+  STATE.survey={ satisfaction:_survey.q0?_survey.q0*20:null,
+    q0:_survey.q0||null,q1:_survey.q1||null,q2:_survey.q2||null,q3:_survey.q3||null,q4:_survey.q4||null };
 }
 async function savePdf(){
   const v=document.getElementById('r-feedback').value.trim();
@@ -1222,7 +1248,7 @@ async function savePdf(){
   // 인쇄 전용 블록 채우기
   const pf=document.getElementById('print-feedback');
   if(pf){ pf.innerHTML=`<div class="card"><h2 style="font-size:16px;">나의 설문 & 소감</h2>
-    <p class="para" style="font-size:13px;">강점 활용도: <b>${STATE.survey.satisfaction}/100</b></p>
+    <p class="para" style="font-size:13px;">강점 활용: <b>${STATE.survey.q0||'-'} / 5</b> · 직무 만족: <b>${STATE.survey.q2||'-'} / 5</b></p>
     <p class="para" style="white-space:pre-wrap;">${esc(v)}</p>
     ${_sogaImg?`<img src="${_sogaImg}" style="max-width:100%;max-height:320px;border-radius:12px;margin-top:8px;">`:''}</div>`; }
   setTimeout(()=>window.print(),350);
@@ -1425,30 +1451,4 @@ async function toggleRev(id,feat){
   if(!DBREADY) return;
   const {error}=await DB.rpc('set_review_featured',{p_id:id,p_featured:feat});
   if(error){ toast('변경 실패'); return; }
-  const it=ADMIN.reviews.find(x=>x.id===id); if(it) it.is_featured=feat; renderRev(); toast(feat?'후기로 공개되었습니다':'비공개 처리되었습니다');
-}
-async function delRev(id){
-  if(!DBREADY||!confirm('이 소감을 삭제할까요?')) return;
-  const {error}=await DB.rpc('admin_delete_review',{p_id:id,p_secret:ADMIN_PW});
-  if(error){ toast('삭제 실패'); return; }
-  ADMIN.reviews=ADMIN.reviews.filter(x=>x.id!==id); renderRev(); toast('삭제되었습니다');
-}
-function exportCsv(){
-  const rows=[['입력일시','진단날짜','직업군','이름','연령','소속','연락처','이메일','대표엔진','1위기어','강점활용도','설문공감','직무만족','자기이해','추천의향',...ALL_GEARS]];
-  ADMIN.records.forEach(r=>{
-    const g=(r.scores&&r.scores.gears)||{}; const sc=r.scores||{}; const sv=sc.survey||{};
-    const dd=sc.diag_date||''; const jg=sc.job_group||'';
-    rows.push([fmtDate(r.created_at),dd,jg,r.user_name||'',r.user_age||'',r.user_job||'',r.user_phone||'',r.user_email||'',r.top_engine||'',r.top_gear||'',sc.satisfaction!=null?sc.satisfaction:'',sv.q1||'',sv.q2||'',sv.q3||'',sv.q4||'',...ALL_GEARS.map(k=>g[k]!=null?g[k]:'')]);
-  });
-  const csv='﻿'+rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
-  const blob=new Blob([csv],{type:'text/csv'}); const url=URL.createObjectURL(blob);
-  const a=document.createElement('a'); a.href=url; a.download=`pbs_paper_records_${new Date().toISOString().slice(0,10)}.csv`; a.click(); URL.revokeObjectURL(url);
-}
-function fmtDate(d){ if(!d) return ''; const dt=new Date(d); return dt.toLocaleDateString('ko-KR',{month:'2-digit',day:'2-digit'})+' '+dt.toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'}); }
-
-// hash routing
-if(location.hash==='#admin'){ openAdmin(); }
-window.addEventListener('hashchange',()=>{ if(location.hash==='#admin') openAdmin(); });
-</script>
-</body>
-</html>
+  const it=ADMIN.reviews.find(x=>x.id===id); if(it) it.is_featured=feat; renderRev(); t
