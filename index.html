@@ -304,7 +304,7 @@ body{font-family:var(--font);background:var(--bg-page);color:var(--text-primary)
     <div class="card">
       <div class="eyebrow">Step 2 / 3</div>
       <h2>종이진단 점수 입력</h2>
-      <p class="sub">종이 진단지에서 <b>12개 색상 조각(기어)별 합산 점수</b>를 입력하세요. 각 조각은 5문항 합계라 <b>최소 5 ~ 최대 25</b>입니다. 합산 값만 있으면 바로 상세 결과를 볼 수 있습니다.</p>
+      <p class="sub">종이 진단지에서 <b>12개 색상 조각(기어)별 합산 점수</b>를 <b>0~25점</b> 숫자로 입력하세요. 합산 값만 있으면 바로 상세 결과를 볼 수 있습니다.</p>
       <div id="summary-body"></div>
       <div class="sticky-cta">
         <button class="btn btn-primary btn-lg" onclick="goSummaryResult()">결과 확인하기 →</button>
@@ -870,7 +870,7 @@ function buildSummary(){
       html+=`<div style="display:flex;align-items:center;gap:11px;padding:11px 0;border-bottom:1px dashed var(--border-subtle);">
         <span class="gtag" style="background:${gm.color};color:#fff;font-size:11px;font-weight:900;padding:3px 9px;border-radius:999px;flex-shrink:0;">${g} ${gm.name}</span>
         <div style="flex:1;font-size:13px;font-weight:600;line-height:1.3;">${gd.name}</div>
-        <input id="sum-${g}" type="number" min="5" max="25" inputmode="numeric" placeholder="5~25" oninput="updateSumProgress()" style="width:84px;text-align:center;font-size:16px;font-weight:800;padding:10px 6px;border:1.5px solid var(--border-default);border-radius:var(--r-md);font-family:var(--font);">
+        <input id="sum-${g}" type="number" min="0" max="25" inputmode="numeric" placeholder="0~25" oninput="updateSumProgress()" style="width:84px;text-align:center;font-size:16px;font-weight:800;padding:10px 6px;border:1.5px solid var(--border-default);border-radius:var(--r-md);font-family:var(--font);">
       </div>`;
     });
     html+=`</div>`;
@@ -907,7 +907,7 @@ function goSummaryResult(){
     const el=document.getElementById('sum-'+g);
     let v=parseInt(el.value);
     if(isNaN(v)){ missing=el; break; }
-    if(v<5) v=5; if(v>25) v=25; el.value=v;
+    if(v<0) v=0; if(v>25) v=25; el.value=v;
     STATE.summaryGears[g]=v; gp[g]=Math.round(v/25*100);
   }
   if(missing){ toast('모든 항목을 5~25점으로 입력해주세요'); missing.scrollIntoView({behavior:'smooth',block:'center'}); try{missing.focus();}catch(e){} return; }
