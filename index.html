@@ -189,15 +189,22 @@ body{font-family:var(--font);background:var(--bg-page);color:var(--text-primary)
 .foot{text-align:center;padding:34px 18px 44px;color:var(--text-muted);font-size:12px;line-height:1.7;}
 .foot b{color:var(--text-secondary);}
 .back-link{display:inline-flex;align-items:center;gap:5px;font-size:13px;color:var(--text-muted);text-decoration:none;font-weight:700;margin-bottom:8px;cursor:pointer;}
+@page{ size:A4; margin:14mm 12mm; }
 @media print{
   .top,.qprogress,.sticky-cta,.no-print,.foot,.back-link{display:none!important;}
   .print-only{display:block!important;}
   .screen{display:none!important;}
   #screen-result.active{display:block!important;}
-  body{background:#fff;}
-  .card{box-shadow:none;border:1px solid #ddd;break-inside:avoid;}
-  .profile-card,.affirm,.hero{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
-  .eng-bar-fill,.gs-dot,.eb-dot,.combo-box{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  html,body{background:#fff!important;width:100%!important;margin:0!important;padding:0!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .wrap{max-width:100%!important;width:100%!important;padding:0!important;margin:0!important;}
+  #screen-result .section{padding:0!important;}
+  .card{box-shadow:none;border:1px solid #e3e0ef;break-inside:avoid;page-break-inside:avoid;margin-bottom:10px!important;padding:16px 14px!important;}
+  .interp h3{break-after:avoid;page-break-after:avoid;}
+  .value-item,.affirm,.heal-item,.eng-bar-row,.gs-item,.combo-box,.interp ul,.chips{break-inside:avoid;page-break-inside:avoid;}
+  h1,h2,h3{break-inside:avoid;page-break-inside:avoid;}
+  img,svg{max-width:100%!important;height:auto!important;}
+  .radar-wrap{overflow:visible!important;}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
 }
 </style>
 </head>
@@ -254,9 +261,30 @@ body{font-family:var(--font);background:var(--bg-page);color:var(--text-primary)
           <input id="f-name" type="text" placeholder="실명 또는 닉네임" maxlength="20">
         </div>
         <div class="field">
+          <label>성별 <span class="opt">(선택)</span></label>
+          <select id="f-gender">
+            <option value="">선택하세요</option>
+            <option>남성</option><option>여성</option>
+          </select>
+        </div>
+      </div>
+      <div class="grid2">
+        <div class="field">
           <label>진단날짜 <span class="req">*</span></label>
           <input id="f-date" type="date">
         </div>
+        <div class="field">
+          <label>연령대 <span class="req">*</span></label>
+          <select id="f-age">
+            <option value="">선택하세요</option>
+            <option>10대</option><option>20대</option><option>30대</option>
+            <option>40대</option><option>50대</option><option>60대 이상</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>직업 · 소속(회사명) <span class="req">*</span></label>
+        <input id="f-job" type="text" placeholder="예: 마케팅팀 / OO기업 / OO학교" maxlength="40">
       </div>
       <div class="field">
         <label>직업군 <span class="req">*</span></label>
@@ -267,20 +295,6 @@ body{font-family:var(--font);background:var(--bg-page);color:var(--text-primary)
           <option>연구·기술</option><option>의료·보건</option><option>예술·디자인</option>
           <option>서비스·판매</option><option>학생</option><option>기타</option>
         </select>
-      </div>
-      <div class="grid2">
-        <div class="field">
-          <label>직업 · 소속(회사명) <span class="req">*</span></label>
-          <input id="f-job" type="text" placeholder="예: 마케팅팀 / OO기업 / OO학교" maxlength="40">
-        </div>
-        <div class="field">
-          <label>연령대 <span class="req">*</span></label>
-          <select id="f-age">
-            <option value="">선택하세요</option>
-            <option>10대</option><option>20대</option><option>30대</option>
-            <option>40대</option><option>50대</option><option>60대 이상</option>
-          </select>
-        </div>
       </div>
       <div class="field">
         <label>연락처 또는 이메일 <span class="opt">(선택)</span></label>
@@ -622,7 +636,7 @@ const ENGINE_DATA = {
 const ALL_GEARS = ['R1','R2','R3','Y1','Y2','Y3','G1','G2','G3','B1','B2','B3'];
 const ENGINE_GEARS = {RED:['R1','R2','R3'],YELLOW:['Y1','Y2','Y3'],GREEN:['G1','G2','G3'],BLUE:['B1','B2','B3']};
 const GEAR_META = {
-  R1:{name:'마젠타',color:'#FF2D78'}, R2:{name:'레드',color:'#FF3366'}, R3:{name:'레드오렌지',color:'#FF5C39'},
+  R1:{name:'레드',color:'#FF2E43'}, R2:{name:'레드오렌지',color:'#FF6A2C'}, R3:{name:'마젠타',color:'#E5308A'},
   Y1:{name:'오렌지',color:'#FF8C1A'}, Y2:{name:'골드',color:'#F5A623'}, Y3:{name:'옐로우',color:'#FFCC29'},
   G1:{name:'옐로우그린',color:'#7DC53E'}, G2:{name:'그린',color:'#00A878'}, G3:{name:'블루그린',color:'#06B6C4'},
   B1:{name:'블루',color:'#0077B6'}, B2:{name:'인디고',color:'#3D5AC9'}, B3:{name:'보라',color:'#7030A0'}
@@ -712,7 +726,7 @@ async function saveRecord(){
   const ageNum=parseInt((u.age||'').replace(/[^0-9]/g,''))||null;
   const payload={
     test_type:TEST_TYPE, is_premium:false, code_id:null,
-    user_name:u.name||null, user_age:ageNum, user_gender:null,
+    user_name:u.name||null, user_age:ageNum, user_gender:u.gender||null,
     user_org:u.job||null, user_email:u.email||null, user_phone:u.phone||null, user_job:u.job||null,
     inst_name:'최해숙', inst_org:'PBS COLOR LAB', user_consent:!!u.consent,
     answers: (STATE.mode==='online' ? STATE.answers : {gear_sums:STATE.summaryGears||{}}), scores:scores,
@@ -782,6 +796,7 @@ function goQuiz(){
   const isEmail=/@/.test(contact);
   STATE.user={
     name:document.getElementById('f-name').value.trim(),
+    gender:document.getElementById('f-gender').value||'',
     job:job, jobGroup:jobGroup,
     age:age,
     diagDate:document.getElementById('f-date').value||new Date().toISOString().slice(0,10),
@@ -1258,13 +1273,12 @@ async function submitSoga(){
   if(th){ th.style.display='block'; th.innerHTML=`<div style="text-align:center;padding:20px 10px;">
       <div style="font-size:44px;line-height:1;">💜</div>
       <h2 style="margin-top:8px;">PBS 컬러와 함께 해주셔서<br>감사합니다!</h2>
-      <p class="sub" style="margin:10px auto;max-width:400px;">소중한 소감이 저장되었어요.${STATE.survey.marketingEmail?' 업데이트 자료도 이메일로 보내드릴게요 📩':''}<br>잠시 후 결과 PDF 저장 창이 열립니다 📄</p>
-      <button class="btn btn-primary btn-lg" style="max-width:320px;margin-top:6px;" onclick="window.print()">📄 결과 PDF 저장하기</button>
+      <p class="sub" style="margin:10px auto;max-width:400px;">소중한 소감이 저장되었어요.${STATE.survey.marketingEmail?' 업데이트 자료도 이메일로 보내드릴게요 📩':''}<br>준비가 되면 아래 버튼을 눌러 결과를 PDF로 저장하세요 📄</p>
+      <button class="btn btn-primary btn-lg" style="max-width:340px;margin-top:10px;" onclick="window.print()">📄 지금 결과 PDF로 저장하기</button>
     </div>`;
     try{ th.scrollIntoView({behavior:'smooth',block:'center'}); }catch(e){}
   }
   toast('소감이 제출되었습니다. 감사합니다!');
-  setTimeout(()=>{ try{window.print();}catch(e){} },800);
 }
 async function savePdf(){
   const v=document.getElementById('r-feedback').value.trim();
@@ -1300,6 +1314,7 @@ function restart(){ if(!STATE._saved && STATE.result) saveRecord(); STATE.answer
   document.querySelectorAll('.scale button.on').forEach(b=>{b.classList.remove('on');b.style.background='';});
   ['f-name','f-job','f-contact','f-date'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
   const jg=document.getElementById('f-jobgroup'); if(jg) jg.value='';
+  const gd=document.getElementById('f-gender'); if(gd) gd.value='';
   document.getElementById('f-age').value=''; document.getElementById('f-consent').checked=false;
   updateProgress(); show('intro');
 }
