@@ -1,0 +1,1743 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+<meta name="theme-color" content="#3D2F90">
+<title>PBS 컬러강점 현장진단 · 결과 확인 | PBS COLOR LAB</title>
+<meta name="description" content="현장강의 종이 진단지(60문항) 결과를 입력하고 나의 4가지 컬러 엔진과 12가지 강점 기어를 즉시 확인하세요. PBS COLOR LAB 최해숙 대표.">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+  --brand-navy:#232E87;--brand-indigo:#3D2F90;--brand-violet:#522F97;--brand-purple:#7030A0;--brand-royal:#4E2480;
+  --brand-gradient:linear-gradient(135deg,#232E87 0%,#3D2F90 30%,#522F97 60%,#7030A0 100%);
+  --brand-gradient-soft:linear-gradient(135deg,#EEF0FB 0%,#F4EEF9 100%);
+  --engine-red:#FF3366;--engine-red-soft:#FF6B8A;--engine-red-bg:#FFF0F4;
+  --engine-yellow:#F5A623;--engine-yellow-soft:#FFD166;--engine-yellow-bg:#FFF8E6;
+  --engine-green:#00A878;--engine-green-soft:#06D6A0;--engine-green-bg:#E6F8F1;
+  --engine-blue:#0077B6;--engine-blue-soft:#4CC9F0;--engine-blue-bg:#E6F4FB;
+  --bg-page:#FBFAFE;--bg-surface:#FFFFFF;--bg-muted:#F4F2FA;
+  --text-primary:#1C1A2E;--text-secondary:#524F6A;--text-muted:#8A87A6;--text-inverse:#FFFFFF;
+  --border-subtle:rgba(82,47,151,0.08);--border-default:rgba(82,47,151,0.14);--border-strong:rgba(82,47,151,0.28);
+  --shadow-sm:0 1px 2px rgba(35,46,135,0.06),0 1px 3px rgba(35,46,135,0.04);
+  --shadow-md:0 4px 12px rgba(35,46,135,0.08),0 2px 4px rgba(35,46,135,0.04);
+  --shadow-lg:0 12px 32px rgba(35,46,135,0.12),0 4px 12px rgba(35,46,135,0.06);
+  --font:'Pretendard Variable','Pretendard',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+  --r-sm:8px;--r-md:12px;--r-lg:16px;--r-xl:24px;--r-full:999px;
+  --ease:cubic-bezier(0.16,1,0.3,1);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:var(--font);background:var(--bg-page);color:var(--text-primary);line-height:1.65;-webkit-font-smoothing:antialiased;font-feature-settings:"tnum";}
+.wrap{max-width:820px;margin:0 auto;padding:0 18px;}
+.screen{display:none;animation:fade .4s var(--ease);}
+.screen.active{display:block;}
+@keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+/* header */
+.top{position:sticky;top:0;z-index:50;background:rgba(251,250,254,.86);backdrop-filter:blur(14px);border-bottom:1px solid var(--border-subtle);}
+.top-in{max-width:820px;margin:0 auto;padding:12px 18px;display:flex;align-items:center;justify-content:space-between;}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:15px;letter-spacing:-.01em;}
+.brand .dot{width:26px;height:26px;border-radius:8px;background:var(--brand-gradient);display:grid;place-items:center;color:#fff;font-size:13px;font-weight:900;}
+.brand small{display:block;font-size:10px;color:var(--text-muted);font-weight:600;letter-spacing:.02em;}
+.admin-link{font-size:11px;color:var(--text-muted);text-decoration:none;padding:5px 12px;border-radius:var(--r-full);border:1px solid var(--border-default);}
+/* hero */
+.hero{background:var(--brand-gradient);color:#fff;border-radius:0 0 32px 32px;padding:44px 18px 52px;text-align:center;position:relative;overflow:hidden;}
+.hero::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 80% 10%,rgba(255,255,255,.14),transparent 40%);pointer-events:none;}
+.hero .badge{display:inline-block;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.25);padding:6px 14px;border-radius:var(--r-full);font-size:12px;font-weight:700;margin-bottom:18px;}
+.hero h1{font-size:30px;font-weight:900;letter-spacing:-.02em;line-height:1.25;margin-bottom:14px;}
+.hero p{font-size:15px;opacity:.92;max-width:560px;margin:0 auto;}
+.engine-chips{display:flex;gap:8px;justify-content:center;margin-top:22px;flex-wrap:wrap;}
+.engine-chips span{padding:7px 15px;border-radius:var(--r-full);font-size:13px;font-weight:800;color:#fff;}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-family:var(--font);font-weight:800;font-size:16px;padding:15px 30px;border-radius:var(--r-full);border:none;cursor:pointer;transition:transform .18s var(--ease),box-shadow .18s var(--ease);letter-spacing:-.01em;}
+.btn-primary{background:var(--brand-gradient);color:#fff;box-shadow:var(--shadow-lg);}
+.btn-primary:hover{transform:translateY(-2px);}
+.btn-lg{width:100%;padding:17px;font-size:17px;}
+.btn-ghost{background:var(--bg-surface);color:var(--brand-purple);border:1.5px solid var(--border-strong);}
+.btn-white{background:#fff;color:var(--brand-indigo);box-shadow:var(--shadow-md);margin-top:26px;}
+.section{padding:22px 0;}
+.card{background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--r-xl);box-shadow:var(--shadow-md);padding:20px 18px;margin-bottom:13px;scroll-margin-top:80px;}
+.card h2{font-size:20px;font-weight:900;letter-spacing:-.02em;margin-bottom:6px;}
+.card .sub{color:var(--text-secondary);font-size:14px;margin-bottom:14px;}
+.eyebrow{font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--brand-purple);margin-bottom:8px;}
+/* form */
+.field{margin-bottom:12px;}
+.field label{display:block;font-size:13px;font-weight:700;margin-bottom:7px;color:var(--text-primary);}
+.field label .req{color:var(--engine-red);}
+.field label .opt{color:var(--text-muted);font-weight:600;font-size:11px;}
+.field input,.field select,.field textarea{width:100%;font-family:var(--font);font-size:15px;padding:13px 14px;border:1.5px solid var(--border-default);border-radius:var(--r-md);background:var(--bg-surface);color:var(--text-primary);transition:border-color .18s;}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--brand-purple);}
+.field textarea{resize:vertical;min-height:110px;line-height:1.6;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+@media(max-width:520px){.grid2{grid-template-columns:1fr;}}
+.hint{font-size:12px;color:var(--text-muted);margin-top:5px;}
+/* question sections */
+.qprogress{position:sticky;top:51px;z-index:40;background:rgba(251,250,254,.94);backdrop-filter:blur(10px);padding:12px 0;margin-bottom:6px;border-bottom:1px solid var(--border-subtle);}
+.qprogress-bar{height:8px;background:var(--bg-muted);border-radius:var(--r-full);overflow:hidden;}
+.qprogress-fill{height:100%;background:var(--brand-gradient);width:0%;transition:width .3s var(--ease);border-radius:var(--r-full);}
+.qprogress-txt{display:flex;justify-content:space-between;font-size:12px;font-weight:700;margin-top:7px;color:var(--text-secondary);}
+.engine-block{border-radius:var(--r-xl);padding:20px 16px;margin-bottom:18px;border:1px solid var(--border-subtle);box-shadow:var(--shadow-sm);}
+.engine-block-head{display:flex;align-items:center;gap:12px;margin-bottom:6px;}
+.engine-block-head .eb-dot{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;color:#fff;font-weight:900;font-size:18px;flex-shrink:0;}
+.engine-block-head h3{font-size:19px;font-weight:900;letter-spacing:-.02em;}
+.engine-block-head .eb-sub{font-size:12px;color:var(--text-secondary);font-weight:600;}
+.engine-quote{font-size:13px;font-style:italic;color:var(--text-secondary);margin:4px 0 16px;padding-left:12px;border-left:3px solid var(--border-default);}
+.gear-group{margin-bottom:14px;}
+.gear-group-title{font-size:13px;font-weight:800;color:var(--text-primary);margin-bottom:10px;display:flex;align-items:center;gap:7px;}
+.gear-group-title .gtag{font-size:10px;font-weight:900;color:#fff;padding:2px 8px;border-radius:var(--r-full);}
+.q{padding:13px 0;border-bottom:1px dashed var(--border-subtle);}
+.q:last-child{border-bottom:none;}
+.q-text{font-size:14.5px;font-weight:600;line-height:1.5;margin-bottom:11px;display:flex;gap:8px;}
+.q-num{flex-shrink:0;font-weight:900;color:var(--text-muted);font-size:13px;min-width:24px;}
+.q-deep{display:inline-block;font-size:10px;font-weight:900;color:#fff;background:var(--brand-purple);padding:1px 7px;border-radius:var(--r-full);margin-left:6px;vertical-align:middle;}
+.scale{display:flex;gap:6px;}
+.scale button{flex:1;font-family:var(--font);font-weight:800;font-size:15px;padding:11px 0;border:1.5px solid var(--border-default);border-radius:var(--r-md);background:var(--bg-surface);color:var(--text-secondary);cursor:pointer;transition:all .14s var(--ease);}
+.scale button:hover{border-color:var(--brand-purple);}
+.scale button.on{color:#fff;border-color:transparent;transform:scale(1.04);box-shadow:var(--shadow-sm);}
+.scale-legend{display:flex;justify-content:space-between;font-size:10.5px;color:var(--text-muted);margin-top:6px;font-weight:600;}
+.sticky-cta{position:sticky;bottom:0;background:linear-gradient(to top,var(--bg-page) 70%,transparent);padding:16px 0 20px;z-index:30;}
+/* result */
+.result-hero{text-align:center;padding:30px 0 10px;}
+.result-hero .rname{font-size:14px;color:var(--text-secondary);font-weight:700;margin-bottom:6px;}
+.result-hero .rmain{font-size:32px;font-weight:900;letter-spacing:-.02em;line-height:1.2;}
+.result-hero .rtag{font-size:15px;color:var(--text-secondary);margin-top:8px;font-weight:600;}
+.radar-wrap{display:flex;justify-content:center;padding:8px 0;}
+.eng-bars{margin-top:6px;}
+.eng-bar-row{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+.eng-bar-row .ebl{width:56px;font-weight:900;font-size:13px;flex-shrink:0;}
+.eng-bar-track{flex:1;height:26px;background:var(--bg-muted);border-radius:var(--r-full);overflow:hidden;position:relative;}
+.eng-bar-fill{height:100%;border-radius:var(--r-full);display:flex;align-items:center;justify-content:flex-end;padding-right:10px;color:#fff;font-weight:900;font-size:12px;transition:width .8s var(--ease);min-width:38px;}
+.combo-box{background:var(--brand-gradient-soft);border:1px solid var(--border-default);border-radius:var(--r-lg);padding:18px;margin-top:8px;}
+.combo-box .clabel{font-weight:900;font-size:16px;margin-bottom:6px;color:var(--brand-indigo);}
+.combo-box p{font-size:14px;color:var(--text-secondary);}
+.interp h3{font-size:16px;font-weight:900;margin:16px 0 8px;padding-left:12px;border-left:4px solid var(--brand-purple);letter-spacing:-.01em;}
+.interp ul{list-style:none;}
+.interp li{position:relative;padding:7px 0 7px 24px;font-size:14px;color:var(--text-secondary);border-bottom:1px dashed var(--border-subtle);}
+.interp li::before{content:"";position:absolute;left:4px;top:15px;width:7px;height:7px;border-radius:50%;background:var(--brand-purple);}
+.interp p.para{font-size:14px;color:var(--text-secondary);}
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin:4px 0 6px;}
+.chips span{font-size:12px;font-weight:700;padding:5px 12px;border-radius:var(--r-full);background:var(--bg-muted);color:var(--text-secondary);}
+.value-item{background:var(--bg-muted);border-radius:var(--r-md);padding:14px;margin-bottom:10px;}
+.value-item .vt{font-weight:900;font-size:14px;margin-bottom:4px;}
+.value-item .vd{font-size:13.5px;color:var(--text-secondary);}
+.value-item .vb{font-size:12px;color:var(--text-muted);margin-top:7px;padding-top:7px;border-top:1px solid var(--border-subtle);}
+.gear-scores{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+@media(max-width:520px){.gear-scores{grid-template-columns:1fr;}}
+.gs-item{display:flex;align-items:center;gap:10px;background:var(--bg-muted);border-radius:var(--r-md);padding:10px 12px;}
+.gs-dot{width:30px;height:30px;border-radius:9px;flex-shrink:0;display:grid;place-items:center;color:#fff;font-weight:900;font-size:11px;}
+.gs-name{font-size:12.5px;font-weight:700;flex:1;line-height:1.3;}
+.gs-pct{font-weight:900;font-size:15px;}
+.heal-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+@media(max-width:520px){.heal-grid{grid-template-columns:1fr 1fr;}}
+.heal-item{background:var(--bg-muted);border-radius:var(--r-md);padding:11px;text-align:center;}
+.heal-item .hl{font-size:13px;font-weight:800;}
+.heal-item .hd{font-size:11px;color:var(--text-muted);margin-top:2px;}
+.affirm{background:var(--brand-gradient);color:#fff;border-radius:var(--r-lg);padding:18px;margin-bottom:10px;font-size:15px;font-weight:700;line-height:1.5;text-align:center;}
+.affirm .aq{opacity:.6;font-size:22px;}
+/* profile */
+.profile-card{background:var(--brand-gradient);color:#fff;border-radius:var(--r-xl);padding:26px 22px;}
+.profile-card h2{font-size:20px;font-weight:900;margin-bottom:4px;}
+.profile-card .ptitle{font-size:13px;opacity:.85;margin-bottom:16px;}
+.profile-card .pquote{font-size:14px;font-style:italic;opacity:.95;border-left:3px solid rgba(255,255,255,.4);padding-left:12px;margin-bottom:18px;line-height:1.55;}
+.pstats{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;}
+.pstat{flex:1;min-width:90px;background:rgba(255,255,255,.12);border-radius:var(--r-md);padding:12px;text-align:center;}
+.pstat b{display:block;font-size:20px;font-weight:900;}
+.pstat span{font-size:11px;opacity:.85;}
+.pbio{font-size:13px;opacity:.92;line-height:1.6;}
+.pbio li{list-style:none;padding:4px 0;padding-left:16px;position:relative;}
+.pbio li::before{content:"✦";position:absolute;left:0;opacity:.7;}
+/* contact channels */
+.ch-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;}
+@media(max-width:520px){.ch-grid{grid-template-columns:1fr;}}
+.ch{display:flex;align-items:center;gap:11px;padding:14px;border-radius:var(--r-md);border:1px solid var(--border-default);text-decoration:none;color:var(--text-primary);background:var(--bg-surface);transition:transform .15s var(--ease),box-shadow .15s;}
+.ch:hover{transform:translateY(-2px);box-shadow:var(--shadow-md);}
+.ch .ci{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;font-size:17px;flex-shrink:0;color:#fff;}
+.ch b{font-size:13px;display:block;}
+.ch span{font-size:12px;color:var(--text-muted);}
+/* soft feedback / pdf */
+.pdf-cta{background:var(--engine-yellow-bg);border:1px dashed var(--engine-yellow);border-radius:var(--r-md);padding:14px;font-size:13px;color:#8a6d1a;margin-top:12px;text-align:center;}
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);background:var(--text-primary);color:#fff;padding:13px 22px;border-radius:var(--r-full);font-size:14px;font-weight:700;box-shadow:var(--shadow-lg);opacity:0;pointer-events:none;transition:all .3s var(--ease);z-index:200;}
+.toast.show{opacity:1;transform:translateX(-50%);}
+/* admin */
+.tabbar{display:flex;gap:6px;margin-bottom:18px;background:var(--bg-muted);padding:5px;border-radius:var(--r-full);}
+.tabbar button{flex:1;font-family:var(--font);font-weight:800;font-size:13px;padding:10px;border:none;border-radius:var(--r-full);background:transparent;color:var(--text-secondary);cursor:pointer;}
+.tabbar button.on{background:var(--bg-surface);color:var(--brand-indigo);box-shadow:var(--shadow-sm);}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;}
+@media(max-width:600px){.stat-grid{grid-template-columns:1fr 1fr;}}
+.stat-box{background:var(--bg-muted);border-radius:var(--r-md);padding:14px;text-align:center;}
+.stat-box b{display:block;font-size:24px;font-weight:900;color:var(--brand-indigo);}
+.stat-box span{font-size:11px;color:var(--text-muted);font-weight:600;}
+.dist-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:13px;}
+.dist-row .dl{width:90px;font-weight:700;flex-shrink:0;}
+.dist-track{flex:1;height:20px;background:var(--bg-muted);border-radius:var(--r-full);overflow:hidden;}
+.dist-fill{height:100%;border-radius:var(--r-full);min-width:24px;color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;}
+.admin-item{background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--r-md);padding:14px;margin-bottom:10px;box-shadow:var(--shadow-sm);}
+.admin-item .ai-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;gap:8px;flex-wrap:wrap;}
+.admin-item .ai-name{font-weight:800;font-size:14px;}
+.admin-item .ai-meta{font-size:11px;color:var(--text-muted);}
+.admin-item .ai-body{font-size:13px;color:var(--text-secondary);line-height:1.55;white-space:pre-wrap;}
+.admin-item .ai-actions{display:flex;gap:8px;margin-top:10px;}
+.badge-tag{font-size:10px;font-weight:900;padding:2px 9px;border-radius:var(--r-full);color:#fff;}
+.mini-btn{font-family:var(--font);font-size:12px;font-weight:800;padding:7px 13px;border-radius:var(--r-full);border:1px solid var(--border-default);background:var(--bg-surface);color:var(--text-secondary);cursor:pointer;}
+.mini-btn.pri{background:var(--brand-gradient);color:#fff;border:none;}
+.mini-btn.danger{color:var(--engine-red);border-color:var(--engine-red);}
+.pw-wrap{max-width:360px;margin:60px auto;text-align:center;}
+.pw-wrap input{width:100%;text-align:center;font-size:22px;letter-spacing:.4em;padding:14px;border:1.5px solid var(--border-default);border-radius:var(--r-md);margin:16px 0;font-family:var(--font);}
+.err{color:var(--engine-red);font-size:13px;font-weight:700;min-height:18px;}
+.print-only{display:none;}
+.foot{text-align:center;padding:34px 18px 44px;color:var(--text-muted);font-size:12px;line-height:1.7;}
+.foot b{color:var(--text-secondary);}
+.back-link{display:inline-flex;align-items:center;gap:5px;font-size:13px;color:var(--text-muted);text-decoration:none;font-weight:700;margin-bottom:8px;cursor:pointer;}
+@page{ size:A4; margin:6mm; }
+@media print{
+  .top,.qprogress,.sticky-cta,.no-print,.foot,.back-link,.toast,#toast{display:none!important;}
+  .print-only{display:block!important;}
+  .screen{display:none!important;}
+  #screen-result.active{display:block!important;}
+  html,body{background:#fff!important;width:100%!important;margin:0!important;padding:0!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .wrap{max-width:100%!important;width:100%!important;padding:0!important;margin:0!important;}
+  #screen-result .section{padding:0!important;margin:0!important;}
+  .card{box-shadow:none;border:1px solid #e3e0ef;margin-bottom:6px!important;padding:10px 12px!important;}
+  .interp h3{break-after:avoid;page-break-after:avoid;margin:10px 0 6px!important;}
+  .value-item,.affirm,.heal-item,.eng-bar-row,.gs-item,.combo-box,.interp ul>li,.chips{break-inside:avoid;page-break-inside:avoid;}
+  h1,h2,h3{break-inside:avoid;page-break-inside:avoid;}
+  .card h2{font-size:17px!important;margin-bottom:4px!important;}
+  .card .sub{margin-bottom:8px!important;}
+  .radar-wrap svg{width:280px!important;height:280px!important;}
+  img,svg{max-width:100%!important;height:auto!important;}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="top-in">
+    <div class="brand">
+      <span class="dot">P</span>
+      <span>PBS 컬러강점<small>현장진단 결과 · PBS COLOR LAB</small></span>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SCREEN: INTRO ===== -->
+<section id="screen-intro" class="screen active">
+  <div class="hero">
+    <span class="badge">🎨 현장강의 종이 진단 · 60문항</span>
+    <h1>나를 움직이는<br>4가지 컬러 엔진</h1>
+    <p>종이 진단지에 표시한 점수를 그대로 입력하면, 나의 컬러 강점 결과를 즉시 확인할 수 있습니다.</p>
+    <div class="engine-chips">
+      <span style="background:var(--engine-red)">RED 추진</span>
+      <span style="background:var(--engine-yellow)">YELLOW 관계</span>
+      <span style="background:var(--engine-green)">GREEN 조화</span>
+      <span style="background:var(--engine-blue)">BLUE 분석</span>
+    </div>
+    <button class="btn btn-white" onclick="goInfo('paper')">📝 진단 결과 입력하고 상세 해석 보기 →</button>
+  </div>
+  <div class="wrap section">
+    <div class="card">
+      <div class="eyebrow">How it works</div>
+      <h2>입력은 3단계로 끝납니다</h2>
+      <p class="sub">약 3~5분이면 충분합니다.</p>
+      <ul class="interp">
+        <li><b>1. 기본 정보</b> — 진단날짜·소속·연령대를 입력합니다. (연락처·이메일은 선택)</li>
+        <li><b>2. 60문항 점수 입력</b> — 종이 진단지에서 색상 조각(기어)별로 합산한 점수를 그대로 입력합니다.</li>
+        <li><b>3. 결과 확인</b> — 나의 컬러 엔진 유형과 12기어 강점을 <b>상세 설명과 함께 즉시</b> 확인하고, 소감을 남기면 결과를 PDF로 저장할 수 있습니다.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SCREEN: INFO ===== -->
+<section id="screen-info" class="screen">
+  <div class="wrap section">
+    <a class="back-link" onclick="show('intro')">← 처음으로</a>
+    <div class="card">
+      <div class="eyebrow">Step 1 / 3</div>
+      <h2>참가자 기본 정보</h2>
+      <p class="sub">통계와 결과 확인을 위해 사용됩니다. <b>소속·연령대</b>만 필수입니다.</p>
+      <div class="grid2">
+        <div class="field">
+          <label>이름 <span class="opt">(선택)</span></label>
+          <input id="f-name" type="text" placeholder="실명 또는 닉네임" maxlength="20">
+        </div>
+        <div class="field">
+          <label>성별 <span class="opt">(선택)</span></label>
+          <select id="f-gender">
+            <option value="">선택하세요</option>
+            <option>남성</option><option>여성</option>
+          </select>
+        </div>
+      </div>
+      <div class="grid2">
+        <div class="field">
+          <label>진단날짜 <span class="req">*</span></label>
+          <input id="f-date" type="date">
+        </div>
+        <div class="field">
+          <label>연령대 <span class="req">*</span></label>
+          <select id="f-age">
+            <option value="">선택하세요</option>
+            <option>10대</option><option>20대</option><option>30대</option>
+            <option>40대</option><option>50대</option><option>60대 이상</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>직업 · 소속(회사명) <span class="req">*</span></label>
+        <input id="f-job" type="text" placeholder="예: 마케팅팀 / OO기업 / OO학교" maxlength="40">
+      </div>
+      <div class="field">
+        <label>직업군 <span class="req">*</span></label>
+        <select id="f-jobgroup">
+          <option value="">선택하세요</option>
+          <option value="mgmt">경영·관리</option><option value="sales_mkt">영업·마케팅</option><option value="office_admin">사무·행정</option>
+          <option value="edu">교육·강의</option><option value="counsel_welfare">상담·복지</option><option value="it_tech">IT·기술·연구</option>
+          <option value="medical">의료·보건</option><option value="art_design">예술·디자인</option><option value="service_retail">서비스·판매</option>
+          <option value="production">생산·현장</option><option value="student">학생</option><option value="homemaker_etc">주부·기타</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>연락처 또는 이메일 <span class="opt">(선택)</span></label>
+        <input id="f-contact" type="text" placeholder="휴대폰 번호 또는 이메일 주소" maxlength="60">
+        <div class="hint">결과 재확인·문의 회신을 원하시면 입력하세요. 입력하지 않아도 결과 확인이 가능합니다.</div>
+      </div>
+      <label style="display:flex;gap:9px;align-items:flex-start;font-size:12.5px;color:var(--text-secondary);cursor:pointer;margin-top:4px;">
+        <input id="f-consent" type="checkbox" style="width:auto;margin-top:3px;flex-shrink:0;">
+        <span>입력하신 정보와 진단 결과는 <b>개인을 식별할 수 없는 통계 형태</b>로 연구, 교육 콘텐츠, 도서·보도자료 제작에 활용될 수 있습니다. 이에 동의합니다.</span>
+      </label>
+      <button class="btn btn-primary btn-lg" style="margin-top:20px;" id="info-next" onclick="goQuiz()">다음 →</button>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SCREEN: SUMMARY (종이진단 요약 점수) ===== -->
+<section id="screen-summary" class="screen">
+  <div class="wrap section">
+    <a class="back-link" onclick="show('info')">← 정보 수정</a>
+    <div class="card">
+      <div class="eyebrow">Step 2 / 3</div>
+      <h2>종이진단 점수 입력</h2>
+      <p class="sub">종이 진단지에서 <b>12개 색상 조각(기어)별 합산 점수</b>를 <b>0~25점</b> 숫자로 입력하세요. 합산 값만 있으면 바로 상세 결과를 볼 수 있습니다.</p>
+      <div id="summary-body"></div>
+      <div class="sticky-cta">
+        <button class="btn btn-primary btn-lg" onclick="goSummaryResult()">결과 확인하기 →</button>
+        <p id="sum-remain" style="text-align:center;font-size:12px;color:var(--text-muted);margin-top:8px;"></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SCREEN: QUIZ ===== -->
+<section id="screen-quiz" class="screen">
+  <div class="wrap">
+    <div class="qprogress">
+      <div class="qprogress-bar"><div class="qprogress-fill" id="q-fill"></div></div>
+      <div class="qprogress-txt"><span id="q-count">0 / 60 문항</span><span id="q-pct">0%</span></div>
+    </div>
+    <a class="back-link" onclick="show('info')">← 정보 수정</a>
+    <p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px;">각 문항에 1~5점으로 솔직하게 답해주세요. <b>1 = 전혀 아니다 · 5 = 매우 그렇다</b></p>
+    <div id="quiz-body"></div>
+    <div class="sticky-cta">
+      <button class="btn btn-primary btn-lg" id="q-submit" onclick="goResult()">결과 확인하기 →</button>
+      <p id="q-remain" style="text-align:center;font-size:12px;color:var(--text-muted);margin-top:8px;"></p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SCREEN: RESULT ===== -->
+<section id="screen-result" class="screen">
+  <div class="wrap section">
+    <div id="result-body"></div>
+  </div>
+</section>
+
+<!-- ===== SCREEN: ADMIN ===== -->
+<section id="screen-admin" class="screen">
+  <div class="wrap section">
+    <div id="admin-lock" class="pw-wrap">
+      <div class="brand" style="justify-content:center;margin-bottom:6px;"><span class="dot">P</span></div>
+      <h2 style="font-size:20px;font-weight:900;">관리자 로그인</h2>
+      <p style="font-size:13px;color:var(--text-muted);">비밀번호를 입력하세요</p>
+      <input id="admin-pw" type="password" maxlength="8" inputmode="numeric" placeholder="••••" onkeydown="if(event.key==='Enter')adminLogin()">
+      <div class="err" id="admin-err"></div>
+      <button class="btn btn-primary btn-lg" onclick="adminLogin()">로그인</button>
+      <a class="back-link" style="margin-top:16px;" onclick="show('intro')">← 사이트로 돌아가기</a>
+    </div>
+    <div id="admin-panel" style="display:none;">
+      <a class="back-link" onclick="show('intro')">← 사이트로 돌아가기</a>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+        <h2 style="font-size:22px;font-weight:900;">관리자 대시보드</h2>
+        <button class="mini-btn" onclick="loadAdminData()">🔄 새로고침</button>
+      </div>
+      <div class="tabbar">
+        <button class="on" data-tab="stat" onclick="adminTab('stat')">통계</button>
+        <button data-tab="inq" onclick="adminTab('inq')">문의</button>
+        <button data-tab="rev" onclick="adminTab('rev')">소감</button>
+        <button data-tab="code" onclick="adminTab('code')">강사코드</button>
+        <button data-tab="all" onclick="adminTab('all')">전체통계</button>
+      </div>
+      <div id="tab-stat" class="admin-tab"></div>
+      <div id="tab-inq" class="admin-tab" style="display:none;"></div>
+      <div id="tab-rev" class="admin-tab" style="display:none;"></div>
+      <div id="tab-code" class="admin-tab" style="display:none;"></div>
+      <div id="tab-all" class="admin-tab" style="display:none;"></div>
+    </div>
+  </div>
+</section>
+
+<div class="toast" id="toast"></div>
+
+<div class="foot">
+  <b>PBS COLOR LAB</b><br>
+  컬러강점 진단지 저작권 C-2021-025229 · © 2025 주식회사 커넥트온브릿지<br>
+  <a class="admin-link" href="#admin" onclick="openAdmin();return false;" style="display:inline-block;margin-top:12px;">관리자</a>
+</div>
+
+<script>
+const QUESTIONS = [
+  // RED-R1: 본능적 추진
+  {id:1,  gear:'R1', cat:'목표·시작', text:'목표가 생기면 깊이 고민하지 않고 바로 행동을 시작하는 편이다.', deep:false},
+  {id:2,  gear:'R1', cat:'속도·즉시성', text:'도전적인 상황에서 오히려 에너지가 솟아오른다.', deep:false},
+  {id:3,  gear:'R1', cat:'결정·실행', text:'어떤 일이든 빨리 결정하고 실행하는 것이 답답한 회의보다 훨씬 좋다.', deep:false},
+  {id:4,  gear:'R1', cat:'본능·적응', text:'변화나 새로운 환경에 빠르게 적응하고 그 안에서 즐긴다.', deep:false},
+  {id:5,  gear:'R1', cat:'★심화: 본능적 추진', text:'"되는지 안 되는지는 해봐야 안다"는 말에 깊이 공감한다.', deep:true},
+  // RED-R2: 결과 지향 리더십
+  {id:6,  gear:'R2', cat:'몰입·집중', text:'목표를 향해 나아갈 때 주변의 잡음에 흔들리지 않는다.', deep:false},
+  {id:7,  gear:'R2', cat:'성과·가치', text:'결과를 만들어내는 사람이 가장 가치 있다고 생각한다.', deep:false},
+  {id:8,  gear:'R2', cat:'리더십·방향', text:'팀이 막힐 때 내가 방향을 제시하고 이끌어가는 편이다.', deep:false},
+  {id:9,  gear:'R2', cat:'도전·전투력', text:'어려운 도전일수록 더 해보고 싶어진다.', deep:false},
+  {id:10, gear:'R2', cat:'★심화: 결과 지향', text:'일을 끝내지 못하고 중단되는 것을 견디기 어렵다.', deep:true},
+  // RED-R3: 완성 에너지
+  {id:11, gear:'R3', cat:'완결·마무리', text:'한번 시작한 일은 끝까지 마무리해야 직성이 풀린다.', deep:false},
+  {id:12, gear:'R3', cat:'멀티태스킹', text:'여러 일을 동시에 처리하면서도 집중력을 유지할 수 있다.', deep:false},
+  {id:13, gear:'R3', cat:'성과·동기', text:'성과가 눈에 보이는 일에 더 큰 동기를 느낀다.', deep:false},
+  {id:14, gear:'R3', cat:'마감·집중력', text:'마감이 다가오면 오히려 집중력이 폭발한다.', deep:false},
+  {id:15, gear:'R3', cat:'★심화: 완성', text:'시작과 끝이 명확한 프로젝트가 가장 만족스럽다.', deep:true},
+
+  // YELLOW-Y1: 연결의 본능
+  {id:16, gear:'Y1', cat:'관계·시작', text:'처음 만난 사람과도 자연스럽게 대화를 시작한다.', deep:false},
+  {id:17, gear:'Y1', cat:'네트워킹', text:'사람들 사이의 관계를 연결하고 모임을 만드는 것이 즐겁다.', deep:false},
+  {id:18, gear:'Y1', cat:'사회 에너지', text:'새로운 사람을 만나는 것이 나에게 에너지를 충전시켜준다.', deep:false},
+  {id:19, gear:'Y1', cat:'관계 유지', text:'다양한 사람들과 친분을 오래 유지하는 능력이 있다.', deep:false},
+  {id:20, gear:'Y1', cat:'★심화: 연결', text:'"함께하면 더 커진다"는 말에 깊이 공감한다.', deep:true},
+  // YELLOW-Y2: 따뜻한 소통
+  {id:21, gear:'Y2', cat:'감정 인식', text:'상대방의 감정 변화를 빠르게 읽어낸다.', deep:false},
+  {id:22, gear:'Y2', cat:'분위기 전환', text:'따뜻한 말 한마디로 무거운 분위기를 바꾸는 능력이 있다.', deep:false},
+  {id:23, gear:'Y2', cat:'중재·조율', text:'갈등 상황에서 중재자 역할을 자연스럽게 맡는다.', deep:false},
+  {id:24, gear:'Y2', cat:'경청·공감', text:'다른 사람의 이야기에 깊이 공감하며 듣는다.', deep:false},
+  {id:25, gear:'Y2', cat:'★심화: 공감 신뢰', text:'사람들이 나에게 고민을 털어놓는 경우가 많다.', deep:true},
+  // YELLOW-Y3: 창의적 표현
+  {id:26, gear:'Y3', cat:'아이디어', text:'새로운 아이디어가 끊임없이 떠오르는 편이다.', deep:false},
+  {id:27, gear:'Y3', cat:'표현력', text:'같은 내용도 더 흥미롭게 표현하는 능력이 있다.', deep:false},
+  {id:28, gear:'Y3', cat:'창의·독창성', text:'창의적이거나 독창적인 일에서 진가를 발휘한다.', deep:false},
+  {id:29, gear:'Y3', cat:'긍정 에너지', text:'분위기를 밝게 만들고 사람들을 즐겁게 하는 것을 좋아한다.', deep:false},
+  {id:30, gear:'Y3', cat:'★심화: 창의 표현', text:'표현하지 못하면 답답해서 견디기 어렵다.', deep:true},
+
+  // GREEN-G1: 평화
+  {id:31, gear:'G1', cat:'긴장 완화', text:'어색하거나 긴장된 자리를 자연스럽게 편안하게 만든다.', deep:false},
+  {id:32, gear:'G1', cat:'안정감', text:'내가 있으면 사람들이 마음을 놓고 편안해한다는 말을 듣는다.', deep:false},
+  {id:33, gear:'G1', cat:'분위기 조성', text:'갈등이나 날카로운 분위기를 부드럽게 가라앉히는 편이다.', deep:false},
+  {id:34, gear:'G1', cat:'배려·수용', text:'상대가 불편하지 않도록 먼저 살피고 맞춰준다.', deep:false},
+  {id:35, gear:'G1', cat:'★심화: 평화의 본능', text:'"함께 있는 자리가 편안해야 한다"는 말에 깊이 공감한다.', deep:true},
+  // GREEN-G2: 성장
+  {id:36, gear:'G2', cat:'회복 지원', text:'힘들어하는 사람이 다시 일어서도록 곁에서 돕는 편이다.', deep:false},
+  {id:37, gear:'G2', cat:'잠재력 발견', text:'상대의 가능성을 먼저 발견하고 키워주는 것이 즐겁다.', deep:false},
+  {id:38, gear:'G2', cat:'멘토링', text:'누군가의 성장을 돕는 일에서 큰 보람을 느낀다.', deep:false},
+  {id:39, gear:'G2', cat:'기다림·지지', text:'상대가 스스로 해낼 때까지 믿고 기다려주는 편이다.', deep:false},
+  {id:40, gear:'G2', cat:'★심화: 다시 세우는 힘', text:'넘어진 사람을 다시 일으켜 세운 경험이 나에게 큰 의미가 있다.', deep:true},
+  // GREEN-G3: 밸런스
+  {id:41, gear:'G3', cat:'균형 감각', text:'어느 한쪽으로 치우치지 않고 균형을 잡으려 한다.', deep:false},
+  {id:42, gear:'G3', cat:'공존 지향', text:'나의 이익과 공동체의 이익을 함께 고려하는 편이다.', deep:false},
+  {id:43, gear:'G3', cat:'지속 가능성', text:'당장의 이익보다 오래 지속될 수 있는 방향을 선택한다.', deep:false},
+  {id:44, gear:'G3', cat:'조화 조정', text:'서로 다른 입장 사이에서 모두가 살 길을 찾아낸다.', deep:false},
+  {id:45, gear:'G3', cat:'★심화: 함께 사는 지혜', text:'"나도 살고 우리도 사는 길"을 찾는 것이 나의 강점이다.', deep:true},
+
+  // BLUE-B1: 신뢰
+  {id:46, gear:'B1', cat:'정확성', text:'맡은 일은 빈틈없이 정확하게 처리하려 한다.', deep:false},
+  {id:47, gear:'B1', cat:'신뢰 평가', text:'주변에서 나를 "믿고 맡길 수 있는 사람"이라고 평가한다.', deep:false},
+  {id:48, gear:'B1', cat:'일관성', text:'한번 한 약속과 기준을 일관되게 지킨다.', deep:false},
+  {id:49, gear:'B1', cat:'책임감', text:'작은 오류도 그냥 넘기지 않고 끝까지 확인한다.', deep:false},
+  {id:50, gear:'B1', cat:'★심화: 신뢰의 기반', text:'"정확함이 곧 신뢰"라는 말에 깊이 공감한다.', deep:true},
+  // BLUE-B2: 분석
+  {id:51, gear:'B2', cat:'논리적 분해', text:'복잡한 문제도 논리적으로 분해하여 접근한다.', deep:false},
+  {id:52, gear:'B2', cat:'차분한 해석', text:'급한 상황에서도 차분하게 원인을 분석하는 편이다.', deep:false},
+  {id:53, gear:'B2', cat:'객관성', text:'감정보다 객관적 근거에 더 신뢰를 둔다.', deep:false},
+  {id:54, gear:'B2', cat:'데이터 검토', text:'판단하기 전 데이터와 사실을 충분히 검토하는 편이다.', deep:false},
+  {id:55, gear:'B2', cat:'★심화: 해석의 힘', text:'복잡한 문제일수록 차분히 뜯어보면 답이 보인다고 믿는다.', deep:true},
+  // BLUE-B3: 체계
+  {id:56, gear:'B3', cat:'정리·체계', text:'정보와 자료를 체계적으로 정리하는 것을 좋아한다.', deep:false},
+  {id:57, gear:'B3', cat:'구조화', text:'복잡한 내용을 누구나 쓸 수 있는 틀과 시스템으로 만든다.', deep:false},
+  {id:58, gear:'B3', cat:'전문성', text:'어떤 분야든 깊이 파고들어 전문성을 쌓는 편이다.', deep:false},
+  {id:59, gear:'B3', cat:'완성도', text:'완성도 높은 결과물을 위해 충분한 시간을 투자한다.', deep:false},
+  {id:60, gear:'B3', cat:'★심화: 구조로 남기기', text:'"깊이는 구조로 남겨야 오래간다"는 말에 깊이 공감한다.', deep:true},
+];
+
+const GEAR_DATA = {
+  R1: {name:'본능적 추진력', tagline:'강렬한 시작과 폭발적 에너지', engine:'RED', tags:['본능','시작','열정','개척'], desc:'아이디어가 떠오르는 순간 바로 행동으로 옮기는 본능적인 추진력. 계획보다 실행이 먼저인 스타일로, 강렬한 첫인상과 폭발적 에너지로 주변을 이끕니다.'},
+  R2: {name:'결과 지향 리더십', tagline:'도전과 성취의 화신', engine:'RED', tags:['도전','리더십','결과','성취'], desc:'목표를 향해 앞으로 나아가는 도전 정신이 강한 타고난 리더. 결과를 만들어내는 것에서 큰 성취감을 느끼며, 어떤 어려움도 "해볼 만한 도전"으로 받아들입니다.'},
+  R3: {name:'성과·완성의 에너지', tagline:'결과로 증명하는 사람', engine:'RED', tags:['성과','실행','완성','집중'], desc:'시작한 일을 끝까지 밀어붙여 성과로 만들어내는 완성의 에너지. 프로젝트를 결과물로 마무리하면서 자신의 정체성과 가치를 확인하며, 실행과 성과의 사이클을 빠르게 반복합니다.'},
+  Y1: {name:'연결의 본능', tagline:'관계 확장의 달인', engine:'YELLOW', tags:['연결','관계','네트워킹','확장'], desc:'사람을 만나고 관계를 넓혀가는 것이 본능적으로 즐거운 유형. 어디서나 자연스럽게 대화를 시작하고, 시너지를 만들어내는 능력이 탁월합니다.'},
+  Y2: {name:'따뜻한 공감 리더십', tagline:'마음을 여는 사람', engine:'YELLOW', tags:['공감','소통','신뢰','리더십'], desc:'따뜻한 말 한마디로 사람의 마음을 열고 신뢰를 쌓는 공감 리더. 경청과 공감을 바탕으로 팀의 분위기를 살리고 협력을 이끄는 힘이 있습니다.'},
+  Y3: {name:'창의적 표현력', tagline:'긍정 바이러스의 주인공', engine:'YELLOW', tags:['창의','표현','긍정','유쾌함'], desc:'독창적인 아이디어와 밝고 유쾌한 에너지로 주변을 환하게 만드는 유형. 생각을 다양한 방식으로 표현하며, 그 과정 자체에서 큰 기쁨을 얻습니다.'},
+  G1: {name:'평화·안정의 분위기', tagline:'편안함을 만드는 사람', engine:'GREEN', tags:['평화','안정','편안함','분위기'], desc:'사람과 자리를 편안하게 만드는 평화의 본능. 긴장된 공간에 안정감을 불어넣고, 누구나 마음을 놓을 수 있는 분위기를 자연스럽게 만들어냅니다.'},
+  G2: {name:'성장·회복의 동반', tagline:'다시 서도록 돕는 사람', engine:'GREEN', tags:['성장','회복','멘토링','지지'], desc:'넘어진 한 사람이 다시 일어서도록 곁에서 돕는 성장의 힘. 상대의 잠재력을 믿고 기다리며, 스스로 다시 설 수 있을 때까지 든든하게 지지합니다.'},
+  G3: {name:'균형·공존의 지혜', tagline:'함께 사는 길을 찾는 사람', engine:'GREEN', tags:['밸런스','균형','공존','조화'], desc:'자기 자신과 공동체를 함께 살리는 균형의 지혜. 어느 한쪽에 치우치지 않고, 개인과 전체가 모두 지속될 수 있는 길을 찾아냅니다.'},
+  B1: {name:'정확함이 쌓는 신뢰', tagline:'믿음을 만드는 사람', engine:'BLUE', tags:['신뢰','정확함','책임','신뢰성'], desc:'한 치의 오차도 놓치지 않는 정확함으로 믿음을 쌓는 신뢰의 힘. 빈틈없는 일처리와 일관된 약속으로 "맡기면 된다"는 신뢰를 만들어냅니다.'},
+  B2: {name:'차분한 분석·해석', tagline:'문제를 풀어내는 사람', engine:'BLUE', tags:['분석','논리','해석','객관성'], desc:'복잡한 문제 앞에서도 흔들리지 않고 차분히 원인을 해석하는 분석의 힘. 데이터와 논리로 상황을 분해하여 핵심을 짚어냅니다.'},
+  B3: {name:'체계·구조의 설계', tagline:'깊이를 구조로 남기는 사람', engine:'BLUE', tags:['체계','구조','전문성','정리'], desc:'깊이 파고든 지식과 경험을 체계와 구조로 남기는 힘. 복잡한 정보를 정리해 누구나 쓸 수 있는 시스템과 틀로 만들어냅니다.'}
+};
+
+const ENGINE_DATA = {
+  RED: {
+    name:'RED 추진 엔진', shortName:'추진', subtitle:'외향형 · 행동형 · 일·성과 중심',
+    color:'#FF3366', colorDark:'#D11A4D', colorSoft:'#FF6B8A', glow:'rgba(255,107,138,0.45)',
+    quote:'되는지 안 되는지는 해봐야 안다',
+    tags:['외향형','일·성과 중심','행동 우선','결과 지향','추진력','도전 정신','목표 집중'],
+    strengths:['빠른 의사결정과 즉각적 실행력','어떤 환경에서도 목표를 향해 돌진하는 추진력','도전적 상황에서 오히려 폭발하는 에너지','결과를 만들어내는 강한 집중력','상황을 주도하는 리더십'],
+    jobs:['창업·스타트업 경영, 기업가 정신','영업·마케팅·비즈니스 개발','프로젝트 매니지먼트 / PM','스포츠·경쟁 분야, 군·경찰·소방','이벤트 기획 및 실행 리더'],
+    communication:'직접적이고 명확하게 말하며 결론부터 이야기. 빙빙 돌리는 표현을 답답해하고 빠른 응답과 실행을 선호. 회의는 짧고 굵게.',
+    stress:['결정이 미뤄지거나 실행이 막힐 때','지나치게 꼼꼼하거나 완벽주의적 환경','성과가 인정받지 못할 때','팀이 소극적이거나 추진력이 부족할 때'],
+    romance:'열정적이고 직접적으로 감정을 표현. 좋아하면 적극적으로 다가가고 관계에서도 리더십. 빠르고 솔직한 관계를 선호하며 함께 목표를 향해 나아가는 파트너십을 중시.',
+    conflict:'문제를 직면하고 정면 돌파. 즉각 해결을 선호하며, 때로는 너무 강하게 밀어붙여 상대를 압도할 수 있음. 갈등 후 빠르게 잊고 다음으로.',
+    values:[
+      {title:'성취와 도전', detail:'새로운 기록을 세우고 자기 한계를 시험할 때 가장 큰 에너지를 얻습니다. 평탄한 성공보다 의미 있는 시도 자체에서 자기 가치를 확인합니다.', basis:'자기결정성 이론(Deci & Ryan, 2000)의 세 가지 기본 심리욕구 중 <b>유능감(competence)</b> 욕구와 직결됩니다. 자기 능력을 확장하는 경험이 내재 동기와 웰빙의 핵심이라는 SDT의 주장과 일치하며, McClelland(1961)의 성취동기 이론, Csikszentmihalyi의 몰입(Flow) 개념과도 닿아 있습니다.'},
+      {title:'자유', detail:'스스로 결정하고 실행하는 자율성이 가장 중요한 동력입니다. 지시·통제·꼼꼼한 절차가 많을수록 동기가 빠르게 식습니다.', basis:'SDT의 <b>자율성(autonomy)</b> 욕구가 매우 강한 프로필입니다. Ryan & Deci(2017)는 행동의 주체가 자신이라고 느낄 때 내재 동기와 심리적 웰빙이 극대화된다고 보았습니다. DISC의 D(Dominance), Big5의 외향성-Activity facet, MBTI의 ETJ 성향 핵심 동인과 일치합니다.'},
+      {title:'인정', detail:'노력과 결과에 대한 명확한 평가가 동기를 유지시켜 줍니다. 두루뭉술한 칭찬보다 "무엇을 어떻게 잘했는지"가 보이는 피드백이 필요합니다.', basis:'McClelland(1985)의 성취동기 이론에 따르면 성취 동기가 강한 개인은 즉각적·구체적 피드백을 통해 동기를 유지합니다. Big5의 외향성과 Achievement Striving(Costa & McCrae, 1992) 하위 특질과도 연관되며, 변혁적 리더십에서 말하는 "Contingent Reward(조건적 보상)" 작동 원리이기도 합니다.'}
+    ],
+    growth:[
+      {title:'100%가 아니어도 괜찮다는 것을 인정하기', detail:'완벽주의를 동력으로 활용하되, 그것이 자신과 팀을 갉아먹지 않도록 "충분히 좋음"의 기준을 함께 두는 것이 장기 성과로 이어집니다.', basis:'Stoeber & Otto(2006)는 완벽주의를 <b>적응적·부적응적</b>으로 구분했고, 부적응적 완벽주의는 번아웃·우울과 강한 정적 상관을 보입니다(Maslach Burnout Inventory 연구). Simon(1956)의 satisficing 개념과 Winnicott(1953)의 "good enough(충분히 좋음)" 개념이 대표적 처방입니다.'},
+      {title:'팀원의 페이스를 배려하는 여유 갖기', detail:'추진력의 그림자는 "내 속도가 기본값"이라는 가정입니다. 다른 사람의 학습 곡선과 회복 시간을 함께 설계할 때 팀 성과가 지속됩니다.', basis:'Bass(1985)의 <b>변혁적 리더십</b> 4요소 중 "Individualized Consideration(개별적 배려)" 차원이 추진형 리더가 가장 약한 영역으로 보고됩니다. Goleman(1995)의 정서지능 중 "사회적 인식(social awareness)" 역량과 직접 연결됩니다.'},
+      {title:'감정을 나누는 관계의 깊이 경험하기', detail:'성과 관계만으로는 채워지지 않는 영역이 있습니다. 감정을 표현하고 받는 경험은 추진형의 장기 회복력을 결정합니다.', basis:'SDT의 세 번째 욕구인 <b>관계성(relatedness)</b>에 해당합니다. Pennebaker(1997)는 정서 표현 억제가 장기적으로 심혈관·면역계 부담을 가중시킨다는 점을 실증했고, Bowlby의 애착 이론은 안전 기지(secure base)가 성인기 회복탄력성의 토대임을 보여줍니다.'}
+    ],
+    healing:[
+      {emoji:'운', label:'운동·스포츠', desc:'몸을 움직여 에너지 발산'},
+      {emoji:'러', label:'사이클·달리기', desc:'속도감 있는 야외 활동'},
+      {emoji:'경', label:'경쟁적 게임', desc:'승부의 짜릿함 충전'},
+      {emoji:'프', label:'새 프로젝트 시작', desc:'시작 자체가 회복'},
+      {emoji:'여', label:'즉흥 여행', desc:'예측 불가능의 자유'},
+      {emoji:'음', label:'에너지 음악', desc:'템포 빠른 음악 감상'}
+    ],
+    affirmations:[
+      '나의 추진력과 행동력은 세상을 움직이는 강력한 힘이다',
+      '나는 도전할 때 가장 빛나며, 그것이 나의 본질이다',
+      '나의 열정은 주변 사람들에게 영감과 에너지를 준다'
+    ],
+    synergyWith:'BLUE', conflictWith:'GREEN'
+  },
+  YELLOW: {
+    name:'YELLOW 관계 엔진', shortName:'관계', subtitle:'외향형 · 표현형 · 사람·과정 중심',
+    color:'#F5A623', colorDark:'#D88300', colorSoft:'#FFD166', glow:'rgba(255,209,102,0.45)',
+    quote:'함께하면 더 커진다',
+    tags:['외향형','사람·과정 중심','표현 우선','영향력 지향','소통·연결','공감 능력','긍정 에너지'],
+    strengths:['사람들을 자연스럽게 연결하고 모이게 하는 능력','따뜻한 공감과 소통으로 신뢰를 쌓는 힘','밝고 긍정적인 에너지로 분위기를 바꾸는 영향력','창의적 아이디어를 생동감 있게 표현','네트워크 확장 — 누구와도 친해지는 사회성'],
+    jobs:['교육·강의·코칭·멘토링','홍보·PR·브랜드 마케팅','방송·유튜브·크리에이터','이벤트·행사 기획 및 진행','커뮤니티 매니저·커뮤니케이션 전문가'],
+    communication:'이야기로 소통하고 감정과 경험을 나누는 것을 즐김. 유머와 따뜻함으로 분위기를 부드럽게 만들고 상대가 편안하도록 배려. 산만해 보이지만 핵심을 잡아냄.',
+    stress:['혼자 고립되거나 소통이 단절될 때','차갑고 비판적인 분위기의 환경','창의적 표현이 억압될 때','반복적이고 단조로운 업무가 계속될 때'],
+    romance:'표현이 풍부하고 낭만적. 감정을 아낌없이 드러내며 함께하는 시간의 분위기·느낌을 중요시. 파트너를 특별하게 느끼게 해주는 것을 잘함.',
+    conflict:'갈등을 대화와 공감으로 풀려 함. 관계 회복을 최우선. 때로는 갈등을 피하기 위해 자신의 불만을 삼키는 경향.',
+    values:[
+      {title:'연결', detail:'사람들과의 깊은 유대감이 삶의 의미를 만듭니다. 혼자 이루는 성공보다 함께 만든 경험에서 더 큰 충족을 느낍니다.', basis:'자기결정성 이론(Deci & Ryan, 2000)의 <b>관계성(relatedness)</b> 욕구가 가장 강하게 나타나는 프로필입니다. Baumeister & Leary(1995)의 "belonging hypothesis(소속 가설)"는 깊은 관계 욕구가 인간의 근본 동기임을 보여주며, Big5의 외향성(Extraversion)과 친화성(Agreeableness)이 동시에 높은 패턴이 관찰됩니다.'},
+      {title:'표현', detail:'자신을 창의적으로 드러낼 때 가장 살아 있다고 느낍니다. 정해진 틀을 따르는 일보다 자기 색을 입힐 수 있는 일에서 동기가 생깁니다.', basis:'Rogers(1961)의 <b>자기실현(self-actualization)</b> 경향성과 진정성(authenticity) 이론에 따르면, 자기를 표현할 때 심리적 일치감(congruence)을 경험합니다. Big5의 Openness(경험 개방성) 중 미적 감수성·창의성 facet, MBTI의 ENFP/ENFJ 성향과 일치합니다.'},
+      {title:'영향력', detail:'세상에 긍정적인 변화를 만들어내는 것이 핵심 가치입니다. 작은 것이라도 누군가의 마음을 움직였다는 피드백이 강력한 보상이 됩니다.', basis:'Bandura(1997)의 <b>자기효능감(self-efficacy)</b> 이론에서, 타인에게 긍정적 영향을 주는 경험은 자기효능감을 강화하는 가장 강력한 원천 중 하나입니다. Bass(1985) 변혁적 리더십의 "Inspirational Motivation(영감적 동기부여)" 차원과 직접 연결됩니다.'}
+    ],
+    growth:[
+      {title:'깊이 있는 실행력과 마무리 습관 기르기', detail:'아이디어와 시작에 강한 만큼, 끝까지 끌고 가는 근육이 약할 수 있습니다. 작은 단위로 완성 경험을 쌓는 것이 회복의 출발점입니다.', basis:'Big5의 <b>성실성(Conscientiousness)</b> 중 "Industriousness(근면성)" facet이 상대적으로 낮은 경향이 나타납니다. Gollwitzer(1999)의 <b>실행 의도(implementation intention)</b> 연구는 "언제·어디서·어떻게"를 미리 정해 두는 것이 마무리 확률을 2~3배 높인다고 보고합니다.'},
+      {title:'경계 설정 — 나의 에너지도 소중히 하기', detail:'모든 사람에게 좋은 사람이 되려는 시도는 결국 자신을 소진시킵니다. "내 에너지의 한계를 인정하기"가 관계의 질을 오히려 높입니다.', basis:'Hochschild(1983)의 <b>정서노동(emotional labor)</b> 이론은 타인 감정을 지속적으로 우선시할 때 정서 소진이 발생함을 보여줍니다. Neff(2003)의 <b>자기자비(self-compassion)</b> 연구는 자기를 돌보는 태도가 번아웃 예방의 핵심 변인임을 실증합니다.'},
+      {title:'혼자만의 시간을 통해 내면 충전하기', detail:'외향형도 회복을 위해 "혼자의 시간"이 필요합니다. 표현하지 않은 자기 생각이 쌓일 공간을 의식적으로 만들어 주세요.', basis:'Cain(2012)과 Brian Little의 <b>"restorative niche(회복 장소)"</b> 개념은 모든 성격 유형이 자기 본성을 회복하는 시간을 필요로 한다고 봅니다. Kaplan(1995)의 <b>주의 회복 이론(Attention Restoration Theory)</b>은 자연·고요 속에서 인지·정서 자원이 충전됨을 보여줍니다.'}
+    ],
+    healing:[
+      {emoji:'노', label:'노래·가요', desc:'감정을 목소리로 풀기'},
+      {emoji:'창', label:'창작 활동', desc:'그림·공예 자기 표현'},
+      {emoji:'수', label:'친구와 수다', desc:'대화로 충전되는 시간'},
+      {emoji:'쇼', label:'쇼핑·구경', desc:'시각적 자극 흡수'},
+      {emoji:'파', label:'파티·모임', desc:'사람 속에서 에너지'},
+      {emoji:'사', label:'사진·영상', desc:'순간 포착의 즐거움'}
+    ],
+    affirmations:[
+      '나의 따뜻한 에너지는 사람들의 삶을 밝게 비추는 빛이다',
+      '나는 사람들을 연결하고 함께 성장하게 만드는 특별한 능력이 있다',
+      '나의 긍정 에너지는 환경을 바꾸고 가능성을 여는 힘이다'
+    ],
+    synergyWith:'GREEN', conflictWith:'BLUE'
+  },
+  GREEN: {
+    name:'GREEN 조화 엔진', shortName:'조화', subtitle:'내향형 · 배려형 · 사람·과정 중심',
+    color:'#00A878', colorDark:'#007D5C', colorSoft:'#06D6A0', glow:'rgba(6,214,160,0.45)',
+    quote:'오래 함께 가는 것이 가장 강하다',
+    tags:['내향형','사람·과정 중심','배려 우선','지속·안정 지향','공동체 의식','신뢰 관계','성장 지향'],
+    strengths:['사람들을 진심으로 배려하고 돕는 따뜻한 마음','한번 맺은 관계를 오래도록 지키는 신뢰와 충성','팀의 조화와 균형을 유지하는 안정적 역할','꾸준하고 성실하게 성장을 추구하는 인내심','깊이 있는 경청과 공감으로 상대를 치유'],
+    jobs:['교사·교육자·상담사·사회복지사','의료·간호·치료·재활 분야','인사·조직 문화 담당자 (HR)','NGO·비영리·사회적 기업','조직 내 팀 서포터·프로젝트 조율자'],
+    communication:'부드럽고 신중한 언어. 상대방의 감정을 먼저 헤아림. 말보다 행동으로 보여주며 직접적 대립보다 중재와 합의를 선호. 깊은 1:1 대화 편안.',
+    stress:['주변이 자꾸 변하고 불안정할 때','갈등이 해결되지 않고 방치될 때','지나치게 경쟁적이고 냉정한 환경','자신의 노력과 배려가 무시될 때'],
+    romance:'깊고 안정적인 관계 추구. 파트너를 세심하게 배려하고 신뢰를 쌓아감. 자극보다는 평온, 흥분보다는 안정에서 사랑을 느끼며 헌신적.',
+    conflict:'갈등을 최대한 피하려 하지만 불가피할 때는 차분하게 풀어냄. 상대의 입장을 충분히 들은 후 해결책을 찾으며 관계 회복을 최우선.',
+    values:[
+      {title:'조화', detail:'사람들이 함께 평화롭게 공존하는 환경을 만드는 것이 가장 중요합니다. 갈등을 줄이고 신뢰가 흐르는 공간에서 가장 안정적으로 기능합니다.', basis:'Big5의 <b>친화성(Agreeableness)</b> 중 협력성(Cooperation)·겸손(Modesty) facet이 매우 높은 프로필입니다. Hofstede의 문화 차원 중 집단주의(collectivism) 가치와 정렬되며, Tomasello(2009)의 진화심리학 연구는 협력이 인간의 적응적 핵심 전략임을 보여줍니다.'},
+      {title:'성장', detail:'한 번에 큰 변화를 만들기보다 꾸준히 더 나은 사람이 되어가는 여정 자체를 즐깁니다. 작은 성장의 누적이 깊은 자기 신뢰로 이어집니다.', basis:'Dweck(2006)의 <b>성장 마인드셋(growth mindset)</b> — "능력은 노력으로 발달한다"는 신념 — 의 전형적 표현입니다. Aristotle의 <b>에우다이모니아(eudaimonia)</b> 개념인 덕(virtue)의 점진적 함양과도 닿아 있으며, SDT의 유능감 욕구를 점진적·누적적 방식으로 충족하는 패턴입니다.'},
+      {title:'신뢰', detail:'한번 맺은 관계의 일관성과 진심이 가장 중요한 자산입니다. 빠른 친밀감보다 시간이 쌓인 관계에서 깊은 안정을 느낍니다.', basis:'Bowlby의 <b>애착 이론(attachment theory)</b>과 Ainsworth의 안전 애착 연구는 일관성과 예측 가능성이 안전 애착의 토대임을 보여줍니다. Putnam(2000)의 <b>사회적 자본(social capital)</b> 이론에서 신뢰는 공동체의 가장 핵심적 자원입니다.'}
+    ],
+    growth:[
+      {title:'자신의 욕구와 감정도 솔직하게 표현하기', detail:'타인을 우선하는 습관은 큰 강점이지만, 자기 욕구를 침묵시키는 패턴은 장기적으로 우울·소진의 원인이 됩니다.', basis:'Jack(1991)의 <b>자기침묵 이론(self-silencing theory)</b>은 자기 욕구를 억압하는 패턴이 우울 증상과 강한 정적 상관을 보임을 실증합니다. SDT의 자율성(autonomy) 욕구가 만성적으로 충족되지 않을 때 웰빙이 저하된다는 Ryan & Deci(2017)의 연구와도 일치합니다.'},
+      {title:'때로는 거절할 수 있는 용기 키우기', detail:'모든 요청을 받아들이는 것이 친절이 아닙니다. 자기 한계를 지키는 거절이 오히려 관계를 건강하게 만듭니다.', basis:'Alberti & Emmons(1970)의 <b>적극성(assertiveness) 훈련</b> 모델은 거절을 자기존중의 표현으로 정의합니다. Figley(1995)의 <b>공감 피로(compassion fatigue)</b> 연구는 돌봄·배려가 강한 사람일수록 의식적 경계 설정이 필수임을 보여줍니다.'},
+      {title:'변화를 두려움이 아닌 성장의 기회로', detail:'안정 추구는 강점이지만, 모든 변화를 위협으로 보면 새로운 가능성을 놓치게 됩니다. "이번에는 무엇을 배울 수 있을까"의 질문으로 전환해 보세요.', basis:'Dweck(2006)의 <b>성장 마인드셋</b>은 변화를 위협이 아닌 학습의 기회로 재정의합니다. Kolb(1984)의 <b>경험학습 사이클(Experiential Learning Cycle)</b>은 구체적 경험 → 성찰 → 개념화 → 실험의 순환에서 변화 자체가 학습의 동력임을 보여줍니다.'}
+    ],
+    healing:[
+      {emoji:'산', label:'자연 산책', desc:'녹지에서의 회복'},
+      {emoji:'책', label:'독서·일기', desc:'조용한 사색의 시간'},
+      {emoji:'식', label:'식물 가꾸기', desc:'생명을 돌보는 평온'},
+      {emoji:'차', label:'차·명상', desc:'느린 호흡의 충전'},
+      {emoji:'요', label:'요가·스트레칭', desc:'몸과 마음의 균형'},
+      {emoji:'반', label:'반려동물', desc:'무조건적 사랑 교환'}
+    ],
+    affirmations:[
+      '나의 배려와 따뜻함은 세상을 더 좋은 곳으로 만드는 힘이다',
+      '나는 천천히, 그러나 확실하게 성장하고 있으며 그것으로 충분하다',
+      '나의 조화로운 에너지는 공동체를 하나로 묶는 보이지 않는 힘이다'
+    ],
+    synergyWith:'YELLOW', conflictWith:'RED'
+  },
+  BLUE: {
+    name:'BLUE 분석 엔진', shortName:'분석', subtitle:'내향형 · 사고형 · 일·성과 중심',
+    color:'#0077B6', colorDark:'#005A8C', colorSoft:'#4CC9F0', glow:'rgba(76,201,240,0.45)',
+    quote:'제대로 하지 않을 거라면 하지 않는 게 낫다',
+    tags:['내향형','일·성과 중심','분석 우선','정확성 지향','논리적 사고','체계화 능력','완벽주의'],
+    strengths:['복잡한 데이터를 분석해 핵심을 도출하는 논리력','정밀하고 체계적인 계획 수립과 실행 능력','깊이 있는 연구와 탐구를 즐기는 학습 능력','품질과 정확도에 대한 높은 기준과 완벽성','직관과 논리를 결합한 독창적 통찰력'],
+    jobs:['데이터 사이언티스트·AI·IT 개발자','연구원·학자·박사·전문 분야 전문가','전략 컨설턴트·경영 분석가','의사·법조인·회계사·세무사','철학·인문학·심층 저술 분야'],
+    communication:'정확하고 논리적인 언어. 사실과 근거를 바탕으로 이야기. 감정적 대화보다 구체적·실질적 내용 선호. 말보다 글로 소통할 때 편안.',
+    stress:['불완전하거나 부정확한 정보로 일해야 할 때','감정적이고 비논리적인 의사결정 환경','준비 없이 즉흥적으로 해야 하는 상황','자신의 기준을 계속 낮추도록 강요받을 때'],
+    romance:'천천히, 신중하게 관계를 발전. 감정 표현이 서툴러 보일 수 있지만 사랑하는 사람을 위해 깊고 진지한 헌신. 지적인 대화 가능한 파트너 선호.',
+    conflict:'감정보다 논리로 갈등을 분석하고 해결책을 찾음. 즉각적 반응보다 충분히 생각한 후 차분하게 대응. 때로는 논리를 앞세우다 상대의 감정을 놓침.',
+    values:[
+      {title:'정확성', detail:'올바른 정보와 완성도 높은 결과물에 대한 기준이 일을 움직이는 동력입니다. 대충 넘어가는 것보다 한 번에 제대로 하는 것이 마음 편합니다.', basis:'Big5의 <b>성실성(Conscientiousness)</b> 중 질서(Order)·신중(Deliberation)·완벽주의(Perfectionism) facet이 높은 프로필입니다. Cacioppo & Petty(1982)의 <b>인지 욕구(Need for Cognition)</b> 척도에서 높은 점수를 보이는 사람들과 사고 패턴이 유사합니다.'},
+      {title:'깊이', detail:'표면적 답이 아닌 본질·원인·구조를 이해할 때 만족합니다. 얕은 합의나 빠른 결론보다 끝까지 파고드는 사고에서 의미를 찾습니다.', basis:'Big5의 <b>경험 개방성(Openness)</b> 중 지적 호기심(Intellect) facet이 높게 나타납니다. Dweck의 <b>숙달 지향(mastery orientation)</b>과 일치하며, Csikszentmihalyi의 몰입(Flow)이 "도전이 능력을 약간 상회할 때" 발생하는 메커니즘과도 연결됩니다.'},
+      {title:'자율', detail:'자기 방식으로 탐구할 자유가 가장 중요합니다. 외부의 지나친 간섭이나 즉흥적 의사결정 요구가 가장 큰 스트레스원입니다.', basis:'자기결정성 이론(Deci & Ryan, 2000)의 <b>자율성(autonomy)</b> 욕구가 매우 강한 프로필입니다. Deci(1971)의 고전적 실험은 외적 보상·통제가 내재 동기를 오히려 약화시킨다는 점을 실증했고, 분석형은 이 효과에 특히 민감합니다.'}
+    ],
+    growth:[
+      {title:'"완벽"보다 "충분히 좋음"의 기준 넓히기', detail:'완벽주의는 품질의 무기이지만, 자신을 향할 때는 실행을 막는 족쇄가 됩니다. "이 단계에서는 70%면 출시한다"는 명시적 기준이 필요합니다.', basis:'Stoeber & Otto(2006)의 <b>적응적·부적응적 완벽주의</b> 구분에서, 자기지향적 완벽주의가 가장 번아웃·우울과 강한 상관을 보입니다. Simon(1956)의 <b>satisficing(만족 추구)</b> 개념은 "최적"이 아닌 "충분히 좋은" 해법으로도 합리적 의사결정이 가능함을 보여줍니다.'},
+      {title:'감정을 논리만큼 소중히 여기는 연습', detail:'감정은 논리의 반대가 아니라 의사결정의 또 다른 정보원입니다. 자신과 상대의 감정 신호를 데이터로 받아들이는 훈련이 도움이 됩니다.', basis:'Mayer & Salovey(1990)와 Goleman(1995)의 <b>정서지능(Emotional Intelligence)</b> 이론은 정서가 합리적 의사결정에 필수 입력임을 보여줍니다. Damasio(1994)의 <b>somatic marker hypothesis(신체 표지 가설)</b>는 정서 신호가 없으면 합리적 판단도 마비됨을 신경과학적으로 증명했습니다.'},
+      {title:'빠른 실행과 피드백을 통한 반복 학습', detail:'완벽한 분석 후 실행이 아니라, 작게 실행 → 피드백 → 수정의 사이클을 짧게 돌리는 것이 분석형의 강점을 가장 잘 활용하는 방식입니다.', basis:'Ries(2011)의 <b>린 스타트업(Lean Startup)</b> 방법론의 build-measure-learn 사이클이 핵심 처방입니다. Boyd의 <b>OODA loop(관찰-방향설정-결정-행동)</b>도 같은 원리로, 분석형이 빠지기 쉬운 <b>분석 마비(analysis paralysis)</b> 예방에 효과적입니다.'}
+    ],
+    healing:[
+      {emoji:'독', label:'심층 독서·연구', desc:'몰입의 즐거움'},
+      {emoji:'퍼', label:'퍼즐·전략 게임', desc:'논리의 유희'},
+      {emoji:'클', label:'클래식·재즈', desc:'정제된 음악 감상'},
+      {emoji:'글', label:'글쓰기·저널', desc:'생각을 정리하는 행위'},
+      {emoji:'사', label:'혼자 산책·사색', desc:'고요한 자기 대화'},
+      {emoji:'명', label:'명상·마음챙김', desc:'마음의 노이즈 정리'}
+    ],
+    affirmations:[
+      '나의 분석력과 논리적 사고는 세상에서 가장 복잡한 문제를 푸는 열쇠다',
+      '완벽을 추구하는 나의 기준이 세상의 질을 높인다',
+      '나의 직관과 통찰은 보이지 않는 것을 보게 해주는 특별한 재능이다'
+    ],
+    synergyWith:'RED', conflictWith:'YELLOW'
+  }
+};
+
+/* ============================================================
+   상수
+   ============================================================ */
+const ALL_GEARS = ['R1','R2','R3','Y1','Y2','Y3','G1','G2','G3','B1','B2','B3'];
+const ENGINE_GEARS = {RED:['R1','R2','R3'],YELLOW:['Y1','Y2','Y3'],GREEN:['G1','G2','G3'],BLUE:['B1','B2','B3']};
+const GEAR_META = {
+  R1:{name:'레드',color:'#FF2E43'}, R2:{name:'레드오렌지',color:'#FF6A2C'}, R3:{name:'마젠타',color:'#E5308A'},
+  Y1:{name:'오렌지',color:'#FF8C1A'}, Y2:{name:'골드',color:'#F5A623'}, Y3:{name:'옐로우',color:'#FFCC29'},
+  G1:{name:'옐로우그린',color:'#7DC53E'}, G2:{name:'그린',color:'#00A878'}, G3:{name:'블루그린',color:'#06B6C4'},
+  B1:{name:'블루',color:'#0077B6'}, B2:{name:'인디고',color:'#3D5AC9'}, B3:{name:'보라',color:'#7030A0'}
+};
+const ENGINE_KO = {RED:'RED 추진',YELLOW:'YELLOW 관계',GREEN:'GREEN 조화',BLUE:'BLUE 분석'};
+const ENGINE_CSS = {RED:'var(--engine-red)',YELLOW:'var(--engine-yellow)',GREEN:'var(--engine-green)',BLUE:'var(--engine-blue)'};
+const ENGINE_HEX = {RED:'#FF3366',YELLOW:'#F5A623',GREEN:'#00A878',BLUE:'#0077B6'};
+const ENGINE_EXTRA = {
+  RED: {
+    workStress:['결정이 미뤄지고 실행이 막힐 때','결론 없이 반복되는 회의, 지나친 보고·승인 절차','변화 없이 같은 일을 반복해야 하는 자리','성과가 눈에 보이지 않거나 인정받지 못할 때'],
+    workCope:'마감과 목표를 명확히 세우고 "언제까지"를 먼저 정하세요. 결과가 보이는 일에 에너지를 집중하고, 단순 반복 업무는 시스템화하거나 위임하면 답답함이 크게 줄어듭니다.',
+    relStress:'RED는 일이 멈춰 있을 때 가장 불안합니다. 상대의 느린 속도가 답답하게 느껴지고, 정작 내 빠른 속도는 상대에게 "재촉"이나 압박으로 전해질 수 있습니다.',
+    relCope:'말이 짧아지고 목소리 톤이 올라가는 순간, 잠시 멈춰 "내가 너무 빠른가?"를 확인하세요. 결정을 재촉하기 전에 "왜 지금 가야 하는지"를 한 박자 설명하면 상대가 함께 움직입니다.',
+    commStyle:'결론부터, 직접적으로 소통합니다. 빠른 응답과 실행을 선호하고 회의는 짧고 굵게. 핵심·마감·기대 결과를 명확히 전달할 때 신뢰가 쌓입니다.',
+    interpersonal:'상대의 신중함을 "느리다"가 아니라 "나중에 문제가 없도록 기준을 확인하는 힘"으로 번역해 보세요. RED의 속도와 상대의 신중함이 만나면 강력한 보완 조합이 됩니다.',
+    keyman:'RED 키맨 — 아무도 첫발을 떼지 못할 때 "우선 작게 해보자"며 정체된 공기를 바꾸는 사람. 일이 자꾸 미뤄지는 팀에 반드시 필요한 흐름의 열쇠입니다.',
+    shadow:'추진력이 과하면 압박이 됩니다. 속도를 없앨 필요는 없습니다. 속도에 잠시의 여유와 설명을 더하면 됩니다.',
+    jobsDetail:['영업·비즈니스 개발, 신규 사업 추진','창업·스타트업 경영, 프로젝트 리딩','행사 총괄·현장 운영, 캠페인 실행','위기 대응·조직 변화가 필요한 자리']
+  },
+  YELLOW: {
+    workStress:['반응이 없는 환경, 혼자 오래 반복 정리하는 일','사람과의 교류가 거의 없는 닫힌 구조','새 아이디어를 낼 수 없는 경직된 조직','"안 돼", "쓸데없는 생각"이라는 말을 들을 때'],
+    workCope:'벌여 놓은 일이 많아지지 않도록, 아이디어를 결과로 남기는 구조(마감·체크리스트·협업자)를 곁에 두세요. 사람과 반응이 오가는 자리에서 에너지를 충전하세요.',
+    relStress:'YELLOW는 가능성이 닫힐 때 불안합니다. 거절이나 부정적 반응에 힘이 빠지고, 인정과 공감이 없으면 쉽게 지칩니다.',
+    relCope:'모두가 나처럼 열려 있지는 않다는 것을 기억하세요. 상대의 신중함을 "찬물"이 아니라 "완성도를 높여주는 브레이크"로 받아들이면 관계가 훨씬 편해집니다.',
+    commStyle:'따뜻하고 표현이 풍부한 소통. 이야기와 감정으로 사람의 마음을 움직입니다. 상대의 반응과 공감을 자주 확인하며 분위기를 밝게 살립니다.',
+    interpersonal:'가능성을 열어 사람을 움직이는 힘. 조용히 조율하는 사람을 "소극적"이 아니라 "관계의 온도를 지키는 사람"으로 보면 서로를 보완하게 됩니다.',
+    keyman:'YELLOW 키맨 — 분위기가 닫힌 팀에서 "이건 다른 방식으로 보여줄 수 있지 않을까요?"라며 가능성과 사람 사이의 연결을 다시 여는 사람.',
+    shadow:'확장이 과하면 산만함이 됩니다. 가능성을 결과로 남겨 아이디어가 흩어지지 않게 하세요.',
+    jobsDetail:['마케팅·홍보·브랜딩·콘텐츠 기획','고객 경험·커뮤니티 운영','교육 진행·강의·네트워킹','스타트업 기획 등 사람의 마음을 움직이는 일']
+  },
+  GREEN: {
+    workStress:['경계 없이 감정 노동을 계속해야 하는 일','자기 돌봄 없이 타인의 문제만 받아내야 하는 자리','"좋은 사람"으로만 버텨야 하는 환경','급격한 변화나 경쟁이 과열된 분위기'],
+    workCope:'따뜻함과 함께 경계와 회복의 구조를 세우세요. 모두를 품으려 하지 말고 "사람을 살리면서도 나 자신을 지킬 수 있는가"를 기준으로 역할을 조정하세요.',
+    relStress:'GREEN은 관계가 흔들릴 때 불안합니다. 불편한 표정, 쌓인 감정, 차가운 분위기에 마음이 먼저 반응해 스스로를 소진하기 쉽습니다.',
+    relCope:'갈등을 혼자 떠안지 말고, 배려 안에 기준을 세우세요. "나도 살고 우리도 사는 길"을 찾을 때 관계가 오래 갑니다. 때로는 거절도 관계를 지키는 방법입니다.',
+    commStyle:'경청과 공감 중심의 부드러운 소통. 상대가 편안하도록 먼저 살피고 맞춰줍니다. 분위기를 안정시키고 갈등의 온도를 낮춥니다.',
+    interpersonal:'관계가 무너지지 않도록 바닥을 받치는 사람. 계속 아이디어를 던지는 사람을 "산만"이 아니라 "가능성을 여는 사람"으로 번역하면 시너지가 납니다.',
+    keyman:'GREEN 키맨 — 갈등이 쌓인 팀에서 말로 드러나지 않은 마음을 먼저 알아차리고, 관계가 무너지기 전에 온도를 조절하는 사람.',
+    shadow:'배려가 과하면 자기희생이나 회피가 됩니다. 배려 안에 기준을 세워 스스로를 함께 지키세요.',
+    jobsDetail:['상담·코칭·교육 운영','고객 케어·복지·돌봄','조직문화·HR·중재','커뮤니티 관리 등 사람을 안정시키는 일']
+  },
+  BLUE: {
+    workStress:['기준 없이 계속 바뀌는 지시','충분히 검토할 시간 없이 빠른 반응만 요구하는 일','정리되지 않은 채 무조건 실행하라는 분위기','즉흥적이고 감정적인 환경'],
+    workCope:'생각하고 정리할 시간과 기준을 세울 권한을 확보하세요. 쌓아온 것을 구조·매뉴얼로 남기면 강점이 빛납니다. 완벽 대신 "충분히 좋음"의 기준도 함께 두세요.',
+    relStress:'BLUE는 기준이 흐릿할 때 불안합니다. 근거 없는 결정과 정리되지 않은 절차에 마음이 불편하고, 분석이 과하면 상대에게 "지적"으로 비칠 수 있습니다.',
+    relCope:'분석에 온도를 더하세요. 옳고 그름을 따지기 전에 상대의 감정을 먼저 인정하면 정확함이 사람에게 닿습니다. 완벽하지 않은 상대도 있는 그대로 받아들여 보세요.',
+    commStyle:'논리와 근거 중심의 정확한 소통. 감정보다 사실에 신뢰를 둡니다. 기준과 순서가 분명할 때 안심하고, 근거를 제시할 때 설득력이 커집니다.',
+    interpersonal:'기준과 구조로 신뢰를 만드는 사람. 빠른 사람을 "무모하다"가 아니라 "멈춘 일을 움직이는 사람"으로 번역하면 서로의 약점을 메웁니다.',
+    keyman:'BLUE 키맨 — 혼란이 반복되는 팀에서 흩어진 말을 정리하고 "기준을 이렇게 정리해 볼까요?"로 구조를 세우는 사람.',
+    shadow:'기준이 과하면 완벽주의나 지적이 됩니다. 분석에 온도를 더해 기준이 사람에게 닿게 하세요.',
+    jobsDetail:['연구·분석·기획','교육 커리큘럼·매뉴얼 제작','시스템 구축·품질관리·데이터 정리','전문 컨설팅 등 기준과 구조를 세우는 일']
+  }
+};
+const ADMIN_PW = '8808';
+const TEST_TYPE = 'paper_60';
+const ENTRY_PATH = 'paper_qr';
+const AGE_BAND = {'10대':'10s','20대':'20s','30대':'30s','40대':'40s','50대':'50s','60대 이상':'60s+'};
+
+const STATE = { answers:{}, user:{}, result:null, recordId:null, startTs:Date.now() };
+
+/* ============================================================
+   Supabase
+   ============================================================ */
+const SB_URL = 'https://oqxlsnyuwtmjmbhgzjoz.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9xeGxzbnl1d3Rtam1iaGd6am96Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3NTc5NDksImV4cCI6MjA5MjMzMzk0OX0.C-PPch12eVru2xhuU80WPYdBj5CJb1Py8m1-OsaGZW8';
+let DB=null, DBREADY=false;
+(function(){
+  try{
+    if(window.supabase && window.supabase.createClient){
+      DB = window.supabase.createClient(SB_URL, SB_KEY, {auth:{persistSession:false},db:{schema:'public'}});
+      DBREADY=true; console.log('[PBS] Supabase 연결 완료');
+    }else{ console.warn('[PBS] Supabase SDK 미로드 — localStorage 모드'); }
+  }catch(e){ console.warn('[PBS] Supabase 초기화 실패',e); }
+})();
+
+async function saveRecord(){
+  if(STATE._saved) return updateRecordSurvey();
+  STATE._saved=true;
+  const r=STATE.result, u=STATE.user;
+  const scores={engines:{},gears:{}};
+  Object.keys(r.engineScores).forEach(e=>scores.engines[e]=r.engineScores[e].percent);
+  ALL_GEARS.forEach(g=>scores.gears[g]=r.gearScores[g].percent);
+  scores.diag_date=u.diagDate||null; scores.entry_mode=STATE.mode||'paper';
+  scores.job_group=u.jobGroupLabel||u.jobGroup||null;
+  scores.survey=STATE.survey||null;
+  scores.marketing_email=(STATE.survey&&STATE.survey.marketingEmail)||null;
+  scores.marketing_consent=!!(STATE.survey&&STATE.survey.marketingConsent);
+  scores.satisfaction=(STATE.survey&&STATE.survey.satisfaction!=null)?STATE.survey.satisfaction:null;
+  const ageNum=parseInt((u.age||'').replace(/[^0-9]/g,''))||null;
+  const payload={
+    test_type:TEST_TYPE, is_premium:false, code_id:null,
+    user_name:u.name||null, user_age:ageNum, user_gender:u.gender||null,
+    user_org:u.job||null, user_email:u.email||null, user_phone:u.phone||null, user_job:u.job||null,
+    inst_name:'최해숙', inst_org:'PBS COLOR LAB', user_consent:!!u.consent,
+    entry_path:ENTRY_PATH, job_group:u.jobGroup||null,
+    age_band:AGE_BAND[u.age]||null,
+    job_satisfaction:(STATE.survey&&STATE.survey.q2)||null,
+    marketing_consent:!!(STATE.survey&&STATE.survey.marketingConsent),
+    answers: (STATE.mode==='online' ? STATE.answers : {gear_sums:STATE.summaryGears||{}}), scores:scores,
+    top_engine:r.mainEngine, top_gear:r.top1.gear, second_engine:r.rankedEngines[1]?.engine||null,
+    duration_sec:Math.max(1,Math.round((Date.now()-STATE.startTs)/1000)),
+    lang:'ko', device:/Mobi|Android/i.test(navigator.userAgent)?'mobile':'desktop',
+    referrer:document.referrer?document.referrer.slice(0,200):null
+  };
+  try{ localStorage.setItem('pbs-paper-last',JSON.stringify({...payload,ts:Date.now()})); }catch(e){}
+  if(!DBREADY) return {ok:false};
+  try{
+    const {data,error}=await DB.from('pbs_records').insert(payload).select('id').single();
+    if(error) throw error;
+    STATE.recordId=data?.id;
+    return {ok:true,id:data?.id};
+  }catch(e){ console.warn('[PBS] 기록 저장 실패',e); return {ok:false,error:e.message}; }
+}
+async function updateRecordSurvey(){
+  if(!DBREADY||!STATE.recordId||!STATE.survey) return {ok:true,id:STATE.recordId};
+  try{
+    const r=STATE.result,u=STATE.user;
+    const scores={engines:{},gears:{}};
+    Object.keys(r.engineScores).forEach(e=>scores.engines[e]=r.engineScores[e].percent);
+    ALL_GEARS.forEach(g=>scores.gears[g]=r.gearScores[g].percent);
+    scores.diag_date=u.diagDate||null; scores.entry_mode=STATE.mode||'paper';
+    scores.job_group=u.jobGroupLabel||u.jobGroup||null;
+    scores.survey=STATE.survey||null;
+    scores.marketing_email=(STATE.survey&&STATE.survey.marketingEmail)||null;
+    scores.marketing_consent=!!(STATE.survey&&STATE.survey.marketingConsent);
+    scores.satisfaction=(STATE.survey&&STATE.survey.satisfaction!=null)?STATE.survey.satisfaction:null;
+    const {error}=await DB.from('pbs_records').update({
+      scores:scores,
+      job_satisfaction:(STATE.survey&&STATE.survey.q2)||null,
+      marketing_consent:!!(STATE.survey&&STATE.survey.marketingConsent)
+    }).eq('id',STATE.recordId);
+    if(error) throw error;
+    return {ok:true,id:STATE.recordId};
+  }catch(e){ console.warn('[PBS] 설문 업데이트 실패',e); return {ok:false}; }
+}
+async function saveReview(text,stars,imgDataUrl){
+  if(!DBREADY) return {ok:false};
+  let full=text;
+  if(imgDataUrl) full=text+'\n[[PBS_IMG]]'+imgDataUrl;
+  try{
+    const {error}=await DB.from('pbs_reviews').insert({
+      name:STATE.user.name||'익명', stars:stars||5, text:full,
+      record_id:STATE.recordId||null, is_visible:true, is_featured:false
+    });
+    if(error) throw error; return {ok:true};
+  }catch(e){ console.warn('[PBS] 소감 저장 실패',e); return {ok:false,error:e.message}; }
+}
+function scheduleSave(){ clearTimeout(STATE._saveTimer); STATE._saveTimer=setTimeout(()=>{ if(!STATE._saved) saveRecord(); },45000); }
+async function saveInquiry(inq){
+  if(!DBREADY) return {ok:false};
+  try{
+    const {error}=await DB.from('pbs_inquiries').insert({
+      inquiry_type:inq.type||'general', name:inq.name||'', org:inq.org||null,
+      email:inq.email||null, phone:inq.phone||null, message:inq.message||'', status:'new',
+      center_slug:'pbs_paper'
+    });
+    if(error) throw error; return {ok:true};
+  }catch(e){ console.warn('[PBS] 문의 저장 실패',e); return {ok:false,error:e.message}; }
+}
+
+/* ============================================================
+   화면 전환
+   ============================================================ */
+function show(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+id).classList.add('active');
+  window.scrollTo({top:0,behavior:'instant'});
+}
+function goInfo(mode){
+  STATE.mode = mode||'paper';
+  const dEl=document.getElementById('f-date');
+  if(dEl && !dEl.value){ dEl.value=new Date().toISOString().slice(0,10); }
+  const nb=document.getElementById('info-next');
+  if(nb) nb.textContent = STATE.mode==='online' ? '다음: 60문항 진단하기 →' : '다음: 결과 점수 입력 →';
+  show('info');
+}
+function goQuiz(){
+  const age=document.getElementById('f-age').value;
+  const job=document.getElementById('f-job').value.trim();
+  const jobGroup=document.getElementById('f-jobgroup').value;
+  const contact=document.getElementById('f-contact').value.trim();
+  if(!jobGroup){ toast('직업군을 선택해주세요'); return; }
+  if(!job){ toast('직업 또는 소속을 입력해주세요'); return; }
+  if(!age){ toast('연령대를 선택해주세요'); return; }
+  const isEmail=/@/.test(contact);
+  STATE.user={
+    name:document.getElementById('f-name').value.trim(),
+    gender:document.getElementById('f-gender').value||'',
+    job:job, jobGroup:jobGroup,
+    jobGroupLabel:(document.getElementById('f-jobgroup').selectedOptions[0]||{}).text||jobGroup,
+    age:age,
+    diagDate:document.getElementById('f-date').value||new Date().toISOString().slice(0,10),
+    email:isEmail?contact:'',
+    phone:isEmail?'':contact,
+    consent:document.getElementById('f-consent').checked
+  };
+  if(STATE.mode==='online'){
+    if(!document.getElementById('quiz-body').dataset.built){ buildQuiz(); }
+    show('quiz'); updateProgress();
+  }else{
+    if(!document.getElementById('summary-body').dataset.built){ buildSummary(); }
+    show('summary');
+  }
+}
+function toast(msg){
+  const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
+  clearTimeout(window._tt); window._tt=setTimeout(()=>t.classList.remove('show'),2400);
+}
+
+/* ============================================================
+   퀴즈 빌드
+   ============================================================ */
+function buildQuiz(){
+  const body=document.getElementById('quiz-body');
+  let html='';
+  Object.keys(ENGINE_GEARS).forEach(eng=>{
+    const ed=ENGINE_DATA[eng];
+    html+=`<div class="engine-block" style="background:${eng==='RED'?'var(--engine-red-bg)':eng==='YELLOW'?'var(--engine-yellow-bg)':eng==='GREEN'?'var(--engine-green-bg)':'var(--engine-blue-bg)'}">
+      <div class="engine-block-head">
+        <div class="eb-dot" style="background:${ENGINE_HEX[eng]}">${eng[0]}</div>
+        <div><h3>${ed.name}</h3><div class="eb-sub">${ed.subtitle}</div></div>
+      </div>
+      <div class="engine-quote">"${ed.quote}"</div>`;
+    ENGINE_GEARS[eng].forEach(gear=>{
+      const gm=GEAR_META[gear], gd=GEAR_DATA[gear];
+      html+=`<div class="gear-group">
+        <div class="gear-group-title"><span class="gtag" style="background:${gm.color}">${gear}</span> ${gd.name}</div>`;
+      QUESTIONS.filter(q=>q.gear===gear).forEach(q=>{
+        html+=`<div class="q">
+          <div class="q-text"><span class="q-num">${q.id}.</span><span>${q.text.replace(/</g,'&lt;')}${q.deep?'<span class="q-deep">심화</span>':''}</span></div>
+          <div class="scale" data-qid="${q.id}">`;
+        for(let v=1;v<=5;v++){
+          html+=`<button type="button" onclick="setAns(${q.id},${v},this)" style="--onc:${ENGINE_HEX[eng]}">${v}</button>`;
+        }
+        html+=`</div>
+          <div class="scale-legend"><span>전혀 아니다</span><span>매우 그렇다</span></div>
+        </div>`;
+      });
+      html+=`</div>`;
+    });
+    html+=`</div>`;
+  });
+  body.innerHTML=html; body.dataset.built='1';
+}
+function setAns(qid,val,btn){
+  STATE.answers[qid]=val;
+  const scale=btn.parentElement;
+  scale.querySelectorAll('button').forEach(b=>{ b.classList.remove('on'); b.style.background=''; });
+  btn.classList.add('on'); btn.style.background=btn.style.getPropertyValue('--onc');
+  updateProgress();
+}
+function updateProgress(){
+  const n=Object.keys(STATE.answers).length;
+  const pct=Math.round(n/60*100);
+  document.getElementById('q-fill').style.width=pct+'%';
+  document.getElementById('q-count').textContent=n+' / 60 문항';
+  document.getElementById('q-pct').textContent=pct+'%';
+  const remain=60-n;
+  document.getElementById('q-remain').textContent = remain>0 ? `아직 ${remain}문항이 남았습니다` : '모든 문항 입력 완료!';
+  document.getElementById('q-submit').style.opacity = remain>0 ? '.6' : '1';
+}
+
+/* ============================================================
+   채점
+   ============================================================ */
+function buildSummary(){
+  const body=document.getElementById('summary-body'); let html='';
+  const bg={RED:'var(--engine-red-bg)',YELLOW:'var(--engine-yellow-bg)',GREEN:'var(--engine-green-bg)',BLUE:'var(--engine-blue-bg)'};
+  Object.keys(ENGINE_GEARS).forEach(eng=>{
+    const ed=ENGINE_DATA[eng];
+    html+=`<div class="engine-block" style="background:${bg[eng]}">
+      <div class="engine-block-head"><div class="eb-dot" style="background:${ENGINE_HEX[eng]}">${eng[0]}</div>
+        <div><h3>${ed.name}</h3><div class="eb-sub">${ed.subtitle}</div></div></div>`;
+    ENGINE_GEARS[eng].forEach(g=>{
+      const gm=GEAR_META[g], gd=GEAR_DATA[g];
+      html+=`<div style="display:flex;align-items:center;gap:11px;padding:11px 0;border-bottom:1px dashed var(--border-subtle);">
+        <span class="gtag" style="background:${gm.color};color:#fff;font-size:11px;font-weight:900;padding:3px 9px;border-radius:999px;flex-shrink:0;">${g}</span>
+        <div style="flex:1;font-size:13px;font-weight:600;line-height:1.3;">${gd.name}</div>
+        <input id="sum-${g}" type="number" min="0" max="25" inputmode="numeric" placeholder="0~25" oninput="updateSumProgress()" style="width:84px;text-align:center;font-size:16px;font-weight:800;padding:10px 6px;border:1.5px solid var(--border-default);border-radius:var(--r-md);font-family:var(--font);">
+      </div>`;
+    });
+    html+=`</div>`;
+  });
+  body.innerHTML=html; body.dataset.built='1'; updateSumProgress();
+}
+function updateSumProgress(){
+  let n=0; for(const g of ALL_GEARS){ const el=document.getElementById('sum-'+g); if(el && el.value!=='' && !isNaN(parseInt(el.value))) n++; }
+  const el=document.getElementById('sum-remain');
+  if(el) el.textContent = n<12 ? `${12-n}개 항목이 남았습니다 (${n}/12)` : '12개 항목 입력 완료!';
+}
+function resultFromGearPercents(gp){
+  const gearScores={}; ALL_GEARS.forEach(g=>gearScores[g]={percent:gp[g]});
+  const engineScores={};
+  Object.keys(ENGINE_GEARS).forEach(e=>{
+    const avg=Math.round(ENGINE_GEARS[e].reduce((s,g)=>s+gp[g],0)/3);
+    engineScores[e]={percent:avg};
+  });
+  const rankedGears=ALL_GEARS.map(g=>({gear:g,percent:gp[g]})).sort((a,b)=>b.percent-a.percent);
+  const top1=rankedGears[0], top2=rankedGears[1];
+  const rankedEngines=Object.keys(engineScores).map(e=>({engine:e,percent:engineScores[e].percent})).sort((a,b)=>b.percent-a.percent);
+  const mainEngine=rankedEngines[0].engine;
+  const e1=gearToEngine(top1.gear), e2=gearToEngine(top2.gear);
+  const adj=[['RED','YELLOW'],['YELLOW','GREEN'],['GREEN','BLUE'],['BLUE','RED']];
+  let cl,cd;
+  if(e1===e2){ cl='집중형 (동일 엔진)'; cd=`${ENGINE_DATA[e1].name}의 강점이 두 기어에 걸쳐 깊고 일관되게 발달한 집중형입니다. 한 분야에서 압도적인 전문성을 발휘하는 패턴입니다.`; }
+  else if(adj.some(p=>(p[0]===e1&&p[1]===e2)||(p[1]===e1&&p[0]===e2))){ cl='조화형 (인접 엔진)'; cd=`${ENGINE_DATA[e1].name}과 ${ENGINE_DATA[e2].name}의 자연스러운 시너지. 서로 다른 특성이 부드럽게 조화를 이루는 균형잡힌 강점 패턴입니다.`; }
+  else{ cl='다재형 (대각 엔진)'; cd=`${ENGINE_DATA[e1].name}과 ${ENGINE_DATA[e2].name}이라는 정반대 성향을 동시에 보유. 상황에 따라 양면을 자유롭게 활용하는 보기 드문 다재다능형 패턴입니다.`; }
+  return {gearScores,engineScores,rankedGears,top1,top2,rankedEngines,mainEngine,combo:{label:cl,desc:cd}};
+}
+function goSummaryResult(){
+  const gp={}; let missing=null; STATE.summaryGears={};
+  for(const g of ALL_GEARS){
+    const el=document.getElementById('sum-'+g);
+    let v=parseInt(el.value);
+    if(isNaN(v)){ missing=el; break; }
+    if(v<0) v=0; if(v>25) v=25; el.value=v;
+    STATE.summaryGears[g]=v; gp[g]=Math.round(v/25*100);
+  }
+  if(missing){ toast('모든 항목을 5~25점으로 입력해주세요'); missing.scrollIntoView({behavior:'smooth',block:'center'}); try{missing.focus();}catch(e){} return; }
+  STATE.result=resultFromGearPercents(gp);
+  renderResult(); show('result');
+  scheduleSave();
+}
+function calculateScores(){
+  const gs={}; ALL_GEARS.forEach(g=>gs[g]={raw:0,weighted:0,max:0,maxWeighted:0});
+  QUESTIONS.forEach(q=>{
+    const a=STATE.answers[q.id]||0; const w=q.deep?1.5:1.0;
+    gs[q.gear].raw+=a; gs[q.gear].weighted+=a*w; gs[q.gear].max+=5; gs[q.gear].maxWeighted+=5*w;
+  });
+  Object.keys(gs).forEach(g=>{ gs[g].percent=Math.round((gs[g].weighted/gs[g].maxWeighted)*100); });
+  const es={};
+  Object.keys(ENGINE_GEARS).forEach(e=>{
+    const sum=ENGINE_GEARS[e].reduce((s,g)=>s+gs[g].weighted,0);
+    const mx=ENGINE_GEARS[e].reduce((s,g)=>s+gs[g].maxWeighted,0);
+    es[e]={percent:Math.round((sum/mx)*100),score:Math.round(sum*10)/10};
+  });
+  return {gearScores:gs,engineScores:es};
+}
+function gearToEngine(g){ return g[0]==='R'?'RED':g[0]==='Y'?'YELLOW':g[0]==='G'?'GREEN':'BLUE'; }
+function computeResult(){
+  const {gearScores,engineScores}=calculateScores();
+  const rankedGears=ALL_GEARS.map(g=>({gear:g,percent:gearScores[g].percent})).sort((a,b)=>b.percent-a.percent);
+  const top1=rankedGears[0], top2=rankedGears[1];
+  const rankedEngines=Object.keys(engineScores).map(e=>({engine:e,percent:engineScores[e].percent})).sort((a,b)=>b.percent-a.percent);
+  const mainEngine=rankedEngines[0].engine;
+  const e1=gearToEngine(top1.gear), e2=gearToEngine(top2.gear);
+  let cl,cd;
+  const adj=[['RED','YELLOW'],['YELLOW','GREEN'],['GREEN','BLUE'],['BLUE','RED']];
+  if(e1===e2){ cl='집중형 (동일 엔진)'; cd=`${ENGINE_DATA[e1].name}의 강점이 두 기어에 걸쳐 깊고 일관되게 발달한 집중형입니다. 한 분야에서 압도적인 전문성을 발휘하는 패턴입니다.`; }
+  else if(adj.some(p=>(p[0]===e1&&p[1]===e2)||(p[1]===e1&&p[0]===e2))){ cl='조화형 (인접 엔진)'; cd=`${ENGINE_DATA[e1].name}과 ${ENGINE_DATA[e2].name}의 자연스러운 시너지. 서로 다른 특성이 부드럽게 조화를 이루는 균형잡힌 강점 패턴입니다.`; }
+  else{ cl='다재형 (대각 엔진)'; cd=`${ENGINE_DATA[e1].name}과 ${ENGINE_DATA[e2].name}이라는 정반대 성향을 동시에 보유. 상황에 따라 양면을 자유롭게 활용하는 보기 드문 다재다능형 패턴입니다.`; }
+  return {gearScores,engineScores,rankedGears,top1,top2,rankedEngines,mainEngine,combo:{label:cl,desc:cd}};
+}
+
+/* ============================================================
+   레이더 차트
+   ============================================================ */
+function renderRadar(gearScores){
+  const W=340,H=340,cx=W/2,cy=H/2,R=118,N=12;
+  const ang=i=>(Math.PI*2*i)/N-Math.PI/2;
+  let grid='';
+  for(let lv=1;lv<=5;lv++){
+    const r=R*lv/5;
+    const pts=ALL_GEARS.map((_,i)=>`${cx+Math.cos(ang(i))*r},${cy+Math.sin(ang(i))*r}`).join(' ');
+    grid+=`<polygon points="${pts}" fill="none" stroke="rgba(120,120,160,.16)" stroke-width="1"/>`;
+  }
+  let axes='';
+  ALL_GEARS.forEach((_,i)=>{ axes+=`<line x1="${cx}" y1="${cy}" x2="${cx+Math.cos(ang(i))*R}" y2="${cy+Math.sin(ang(i))*R}" stroke="rgba(120,120,160,.16)" stroke-width="1"/>`; });
+  const dataPts=ALL_GEARS.map((g,i)=>{ const r=R*gearScores[g].percent/100; return `${cx+Math.cos(ang(i))*r},${cy+Math.sin(ang(i))*r}`; }).join(' ');
+  let dots='',lbls='';
+  ALL_GEARS.forEach((g,i)=>{
+    const r=R*gearScores[g].percent/100, x=cx+Math.cos(ang(i))*r, y=cy+Math.sin(ang(i))*r;
+    dots+=`<circle cx="${x}" cy="${y}" r="3.5" fill="${GEAR_META[g].color}" stroke="#fff" stroke-width="1.5"/>`;
+    const lr=R+18, lx=cx+Math.cos(ang(i))*lr, ly=cy+Math.sin(ang(i))*lr;
+    lbls+=`<text x="${lx}" y="${ly}" text-anchor="middle" dominant-baseline="middle" font-size="10" font-weight="800" fill="${GEAR_META[g].color}">${g}</text>`;
+  });
+  return `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" style="max-width:100%;height:auto;">
+    ${grid}${axes}
+    <polygon points="${dataPts}" fill="rgba(112,48,160,.16)" stroke="var(--brand-purple)" stroke-width="2"/>
+    ${dots}${lbls}</svg>`;
+}
+
+/* ============================================================
+   결과 렌더
+   ============================================================ */
+function goResult(){
+  const n=Object.keys(STATE.answers).length;
+  if(n<60){ toast(`아직 ${60-n}문항이 남았습니다`);
+    const firstEmpty=QUESTIONS.find(q=>!STATE.answers[q.id]);
+    if(firstEmpty){ const el=document.querySelector(`.scale[data-qid="${firstEmpty.id}"]`); if(el) el.scrollIntoView({behavior:'smooth',block:'center'}); }
+    return; }
+  STATE.result=computeResult();
+  renderResult();
+  show('result');
+  scheduleSave();
+}
+function renderResult(){
+  const r=STATE.result, me=r.mainEngine, ed=ENGINE_DATA[me], ex=ENGINE_EXTRA[me], u=STATE.user;
+  const bg=me==='RED'?'var(--engine-red-bg)':me==='YELLOW'?'var(--engine-yellow-bg)':me==='GREEN'?'var(--engine-green-bg)':'var(--engine-blue-bg)';
+  const dd=u.diagDate?new Date(u.diagDate).toLocaleDateString('ko-KR',{year:'numeric',month:'long',day:'numeric'}):new Date().toLocaleDateString('ko-KR',{year:'numeric',month:'long',day:'numeric'});
+  const modeLabel=STATE.mode==='online'?'온라인 진단':'종이진단';
+  let h='';
+  // PDF 전용 레포트 표지 제목
+  h+=`<div class="print-only" style="text-align:center;padding:2px 0 12px;border-bottom:2px solid var(--brand-purple);margin-bottom:12px;">
+    <div style="font-size:22px;font-weight:900;color:var(--brand-indigo);letter-spacing:-.02em;">${u.name?esc(u.name)+' 님':'나'}의 컬러강점 진단 결과 레포트</div>
+    <div style="font-size:12px;color:var(--text-muted);margin-top:4px;">PBS COLOR LAB · 진단일 ${dd}</div>
+  </div>`;
+  // 1) hero
+  h+=`<div class="card" style="text-align:center;background:linear-gradient(160deg,#fff,${bg});">
+    <div class="result-hero" style="padding-top:6px;">
+      ${u.name?`<div class="rname">${esc(u.name)} 님의 컬러 강점 결과</div>`:'<div class="rname">나의 컬러 강점 결과</div>'}
+      <div class="rmain" style="color:${ENGINE_HEX[me]}">${ed.name}</div>
+      <div class="rtag">${ed.shortName} 엔진 · ${ed.subtitle}</div>
+      <div style="font-size:12px;color:var(--text-muted);margin-top:6px;">진단일 ${dd} · 60문항 ${modeLabel}</div>
+    </div>
+    <div class="radar-wrap">${renderRadar(r.gearScores)}</div>
+  </div>`;
+  // 2) engine bars
+  h+=`<div class="card"><div class="eyebrow">4 Engine Balance</div><h2>나의 4엔진 강도</h2><p class="sub">각 컬러 엔진이 나를 움직이는 비중입니다.</p><div class="eng-bars">`;
+  r.rankedEngines.forEach(e=>{
+    h+=`<div class="eng-bar-row"><div class="ebl" style="color:${ENGINE_HEX[e.engine]}">${e.engine}</div>
+      <div class="eng-bar-track"><div class="eng-bar-fill" style="width:${Math.max(e.percent,6)}%;background:${ENGINE_HEX[e.engine]}">${e.percent}%</div></div></div>`;
+  });
+  h+=`</div></div>`;
+  // 3) combo
+  h+=`<div class="card"><div class="eyebrow">Top 2 Combination</div><h2>강점 조합</h2>
+    <div style="display:flex;gap:10px;margin:10px 0;flex-wrap:wrap;">
+      <div style="flex:1;min-width:130px;background:var(--bg-muted);border-radius:var(--r-md);padding:14px;text-align:center;">
+        <div style="font-size:11px;color:var(--text-muted);font-weight:800;">1위 기어</div>
+        <div style="font-size:18px;font-weight:900;color:${GEAR_META[r.top1.gear].color}">${r.top1.gear}</div>
+        <div style="font-size:12px;color:var(--text-secondary);">${GEAR_DATA[r.top1.gear].name} · ${r.top1.percent}%</div>
+      </div>
+      <div style="flex:1;min-width:130px;background:var(--bg-muted);border-radius:var(--r-md);padding:14px;text-align:center;">
+        <div style="font-size:11px;color:var(--text-muted);font-weight:800;">2위 기어</div>
+        <div style="font-size:18px;font-weight:900;color:${GEAR_META[r.top2.gear].color}">${r.top2.gear}</div>
+        <div style="font-size:12px;color:var(--text-secondary);">${GEAR_DATA[r.top2.gear].name} · ${r.top2.percent}%</div>
+      </div>
+    </div>
+    <div class="combo-box"><div class="clabel">${r.combo.label}</div><p>${r.combo.desc}</p></div>
+  </div>`;
+  // 4) 상위 강점 기어 상세 (Top 3) — 조합 바로 뒤 배치
+  const topGears=r.rankedGears.slice(0,3);
+  h+=`<div class="card interp"><div class="eyebrow">My Top Gears</div><h2>나의 상위 강점 기어 3가지</h2>
+    <p class="sub">가장 강하게 발달한 3가지 세부 강점(기어)입니다.</p>`;
+  topGears.forEach((g,idx)=>{
+    const gm=GEAR_META[g.gear], gd=GEAR_DATA[g.gear], eng=gearToEngine(g.gear);
+    const gbg=eng==='RED'?'var(--engine-red-bg)':eng==='YELLOW'?'var(--engine-yellow-bg)':eng==='GREEN'?'var(--engine-green-bg)':'var(--engine-blue-bg)';
+    h+=`<div style="border:1px solid var(--border-subtle);border-radius:var(--r-lg);padding:16px;margin-bottom:12px;background:linear-gradient(160deg,#fff,${gbg});">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+        <div style="width:46px;height:46px;border-radius:13px;background:${gm.color};color:#fff;display:grid;place-items:center;font-weight:900;font-size:14px;flex-shrink:0;">${g.gear}</div>
+        <div style="flex:1;">
+          <div style="font-size:11px;font-weight:800;color:var(--text-muted);">${idx+1}위 강점</div>
+          <div style="font-size:17px;font-weight:900;letter-spacing:-.01em;">${gd.name}</div>
+          <div style="font-size:12px;color:var(--text-secondary);font-weight:600;">${gd.tagline}</div>
+        </div>
+        <div style="font-size:20px;font-weight:900;color:${gm.color};">${g.percent}%</div>
+      </div>
+      <p style="font-size:13.5px;color:var(--text-secondary);line-height:1.6;">${gd.desc}</p>
+      <div class="chips" style="margin-top:8px;">${gd.tags.map(t=>`<span style="background:${gm.color}22;color:${gm.color};">#${t}</span>`).join('')}</div>
+    </div>`;
+  });
+  h+=`</div>`;
+  // 5) 통합 상세 해석 (중복 제거, 같은 주제는 합쳐 더 상세하게)
+  const allJobs=[...ed.jobs, ...ex.jobsDetail];
+  const allStress=[...ed.stress, ...ex.workStress];
+  h+=`<div class="card interp">
+    <div class="eyebrow">Deep Interpretation</div>
+    <h2>${ed.name} — 상세 강점 해석</h2>
+    <div class="chips">${ed.tags.map(t=>`<span>${t}</span>`).join('')}</div>
+
+    <h3>💪 핵심 강점</h3><ul>${ed.strengths.map(s=>`<li>${s}</li>`).join('')}</ul>
+
+    <h3>💬 소통 스타일</h3>
+    <p class="para">${ed.communication}</p>
+    <p class="para" style="margin-top:8px;">${ex.commStyle}</p>
+
+    <h3>💼 이런 일·역할에서 빛납니다</h3><ul>${allJobs.map(s=>`<li>${s}</li>`).join('')}</ul>
+
+    <h3>😮‍💨 업무에서 스트레스를 받는 순간</h3><ul>${allStress.map(s=>`<li>${s}</li>`).join('')}</ul>
+    <p class="para" style="margin-top:8px;"><b style="color:var(--brand-purple)">대처법 &nbsp;</b>${ex.workCope}</p>
+
+    <h3>❤️ 대인관계에서의 나</h3>
+    <p class="para">${ed.romance}</p>
+    <p class="para" style="margin-top:8px;"><b style="color:var(--brand-purple)">불안한 순간 &nbsp;</b>${ex.relStress}</p>
+    <p class="para" style="margin-top:8px;"><b style="color:var(--brand-purple)">갈등할 때 &nbsp;</b>${ed.conflict}</p>
+    <p class="para" style="margin-top:8px;"><b style="color:var(--brand-purple)">관계를 지키는 법 &nbsp;</b>${ex.relCope}</p>
+    <p class="para" style="margin-top:8px;"><b style="color:var(--brand-purple)">다름을 보완으로 &nbsp;</b>${ex.interpersonal}</p>
+
+    <div class="combo-box" style="margin-top:14px;"><div class="clabel">🔑 나의 키맨(Key Man) 역할</div><p>${ex.keyman}</p></div>
+
+    <h3 style="margin-top:18px;">🌟 나를 움직이는 핵심 가치</h3>
+    ${ed.values.map(v=>`<div class="value-item"><div class="vt">${v.title}</div><div class="vd">${v.detail}</div><div class="vb">📖 ${v.basis}</div></div>`).join('')}
+
+    <h3>🌱 성장 포인트</h3>
+    ${ed.growth.map(v=>`<div class="value-item"><div class="vt">${v.title}</div><div class="vd">${v.detail}</div></div>`).join('')}
+
+    <h3>🌑 강점이 과할 때 (그림자)</h3><p class="para">${ex.shadow}</p>
+
+    <h3>🔋 회복·자기충전 방법</h3>
+    <div class="heal-grid">${ed.healing.map(hl=>`<div class="heal-item"><div class="hl">${hl.label}</div><div class="hd">${hl.desc}</div></div>`).join('')}</div>
+  </div>`;
+  // 6) 자기확언 (소감 바로 위)
+  h+=`<div class="card interp" style="background:linear-gradient(160deg,#fff,${bg});">
+    <div class="eyebrow">Affirmations</div>
+    <h2>나를 위한 자기확언</h2>
+    <p class="sub">오늘의 나에게 건네는 문장입니다. 소리 내어 한 번 읽어보세요.</p>
+    ${ed.affirmations.map(a=>`<div class="affirm"><span class="aq">"</span> ${a} <span class="aq">"</span></div>`).join('')}
+  </div>`;
+  // 7) 소감 & PDF (친근한 리빌형)
+  h+=`<div class="card no-print" style="text-align:center;background:var(--brand-gradient-soft);border:1px solid var(--border-default);">
+    <div style="font-size:38px;line-height:1;">💜</div>
+    <h2 style="margin-top:6px;">오늘 진단, 어떠셨나요?</h2>
+    <p class="sub" style="max-width:440px;margin:8px auto 2px;">짧은 소감 한 줄이면 충분해요. 소감을 남겨주시면 나의 결과를 <b>예쁜 PDF</b>로 받아볼 수 있어요 📄</p>
+    <div id="survey-cta">
+      <button class="btn btn-primary btn-lg" style="max-width:360px;margin:12px auto 0;" onclick="openSurvey()">✍️ 소감 쓰고 결과 PDF 받기</button>
+    </div>
+    <div id="survey-block" style="display:none;text-align:left;margin-top:20px;">
+      <div style="background:var(--bg-surface);border-radius:var(--r-lg);padding:18px;box-shadow:var(--shadow-sm);">
+        <p style="font-size:13px;font-weight:800;color:var(--brand-purple);margin-bottom:12px;">🎨 아주 잠깐이면 돼요</p>
+        ${surveyQ('sat','1. 지금 나는 내 강점 컬러를 일·삶에서 잘 활용하고 있다')}
+        ${surveyQ('q1','2. 진단 결과가 나와 잘 맞았나요?')}
+        ${surveyQ('q2','3. 지금 내 일·직무에 만족하나요?')}
+        ${surveyQ('q3','4. 이 진단이 나를 이해하는 데 도움이 됐나요?')}
+        ${surveyQ('q4','5. 주변에도 추천하고 싶은가요?')}
+      </div>
+      <div class="field" style="margin-top:16px;"><label>⭐ 이 진단, 별점을 준다면? <span class="req">*</span></label>
+        <div id="star-row" style="font-size:34px;letter-spacing:6px;cursor:pointer;user-select:none;">
+          ${[1,2,3,4,5].map(n=>`<span onclick="setStar(${n})" data-star="${n}" style="color:#E3DFF0;">★</span>`).join('')}
+        </div></div>
+      <div class="field"><label>💬 오늘 나에 대해 알게 된 점이나 느낀 점, 도움이 된 부분은 어떤 부분인가요? <span class="req">*</span></label>
+        <textarea id="r-feedback" placeholder="예: 내가 왜 그렇게 행동했는지 이해가 됐어요. OO 부분이 특히 도움이 됐고, 앞으로 이런 강점을 더 살려보고 싶어요 :)"></textarea></div>
+      <div class="field"><label>📷 사진 첨부 <span class="opt">(선택 · 결과 PDF에 함께 담겨요)</span></label>
+        <input id="r-image" type="file" accept="image/*" onchange="onImagePick(this)" style="font-size:13px;">
+        <div id="img-preview" style="margin-top:10px;"></div></div>
+      <div class="field" style="background:var(--bg-muted);border-radius:var(--r-md);padding:14px;">
+        <label style="font-size:13px;">📩 향후 PBS 컬러랩의 <b>업데이트 자료·소식</b>을 받아보고 싶다면 이메일을 남겨주세요 <span class="opt">(선택)</span></label>
+        <input id="r-email2" type="email" placeholder="이메일 주소" maxlength="60" style="margin-top:6px;">
+        <label style="display:flex;gap:8px;align-items:flex-start;font-size:12px;color:var(--text-secondary);margin-top:9px;cursor:pointer;">
+          <input id="r-consent2" type="checkbox" style="width:auto;margin-top:2px;flex-shrink:0;">
+          <span>PBS 컬러랩의 자료·소식 수신에 동의합니다.</span></label>
+      </div>
+      <button class="btn btn-primary btn-lg" style="margin-top:8px;" onclick="submitSoga()">💜 소감 제출하고 결과 PDF 받기</button>
+      <p style="text-align:center;font-size:11px;color:var(--text-muted);margin-top:8px;">별점과 소감을 남기면 결과가 PDF로 저장됩니다</p>
+      <div id="thanks" style="display:none;"></div>
+    </div>
+  </div>`;
+  // 인쇄 전용 소감·이미지 블록
+  h+=`<div id="print-feedback" class="print-only"></div>`;
+  // 강사 프로필
+  h+=`<div class="card no-print" style="padding:0;overflow:hidden;border:none;background:none;box-shadow:none;">
+    <div class="profile-card">
+      <div style="font-size:11px;font-weight:800;letter-spacing:.1em;opacity:.85;margin-bottom:6px;">PBS 컬러강점 진단 개발자 · 대표</div>
+      <h2>최해숙 대표</h2>
+      <div class="ptitle">Choi Hae Sook · PBS COLOR LAB</div>
+      <div class="pquote">"당신은 이미 특별합니다. 컬러는 그 특별함을 발견하고 자신답게 살아가는 도구일 뿐입니다."</div>
+      <div class="pstats">
+        <div class="pstat"><b>200+</b><span>B2B 파트너 기관</span></div>
+        <div class="pstat"><b>4.79</b><span>교육 만족도 / 5.0</span></div>
+        <div class="pstat"><b>10,000+</b><span>누적 컨설팅·교육생</span></div>
+      </div>
+      <ul class="pbio">
+        <li>K-Color 776 마스터 · 두바이 왕실 로얄패밀리 공주 VIP 컨설팅 (2024)</li>
+        <li>대구가톨릭대 대학원 뷰티케어전공 외래교수 · 울산대 MBA</li>
+        <li>AICI 국제이미지컨설턴트협회 KC챕터 부회장</li>
+        <li>저서 『상처도 스펙이다』(2017 베스트셀러 1위) · 『색과 숫자의 기적』(2023)</li>
+        <li>KBS 아침마당 · 생생투데이 · 심현섭의 울산시대 출연</li>
+        <li>현대·삼성·HD현대중공업·KIA·VOLVO·KOTRA·연세대 등 200+ 기관 강의</li>
+      </ul>
+    </div>
+  </div>`;
+  // 교육 문의 (이메일 · 카카오만)
+  h+=`<div class="card no-print">
+    <div class="eyebrow">Contact</div>
+    <h2>교육·컨설팅 문의</h2>
+    <p class="sub">컬러강점 강의·1:1 컨설팅·강사 자격과정 등 궁금한 점을 남겨주세요.</p>
+    <div class="field"><label>문의 유형</label>
+      <select id="i-type">
+        <option value="lecture">강의 문의</option>
+        <option value="consulting">1:1 컨설팅 문의</option>
+        <option value="certification">강사 자격과정</option>
+        <option value="partnership">협력 제안</option>
+        <option value="general">기타 문의</option>
+      </select></div>
+    <div class="grid2">
+      <div class="field"><label>성함 <span class="req">*</span></label><input id="i-name" type="text" placeholder="이름" maxlength="20"></div>
+      <div class="field"><label>연락처</label><input id="i-phone" type="text" placeholder="휴대폰 번호" maxlength="30"></div>
+    </div>
+    <div class="field"><label>이메일</label><input id="i-email" type="text" placeholder="이메일 주소" maxlength="60"></div>
+    <div class="field"><label>문의 내용 <span class="req">*</span></label><textarea id="i-msg" placeholder="문의하실 내용을 자유롭게 적어주세요"></textarea></div>
+    <button class="btn btn-primary btn-lg" onclick="sendInquiry()">문의 접수하기</button>
+    <div class="ch-grid">
+      <a class="ch" href="mailto:pbscolor77@naver.com" target="_blank">
+        <div class="ci" style="background:var(--brand-indigo)">✉️</div>
+        <div><b>이메일 문의</b><span>pbscolor77@naver.com</span></div></a>
+      <a class="ch" href="http://pf.kakao.com/_xfdfbn" target="_blank" rel="noopener">
+        <div class="ci" style="background:#FEE500;color:#3C1E1E">💬</div>
+        <div><b>카카오톡 채널</b><span>@PBS</span></div></a>
+    </div>
+  </div>`;
+  h+=`<div class="no-print" style="text-align:center;padding:10px 0 30px;">
+    <button class="btn btn-ghost" onclick="restart()">🔄 다른 결과 새로 입력하기</button>
+  </div>`;
+  document.getElementById('result-body').innerHTML=h;
+}
+function esc(s){ return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+let _fbSaved=false, _star=0, _satTouched=false, _sogaImg=null;
+function surveyQ(id,label){
+  return `<div class="field"><label>${label}</label>
+    <div class="scale" data-sq="${id}">${[1,2,3,4,5].map(v=>`<button type="button" onclick="setSurvey('${id}',${v},this)">${v}</button>`).join('')}</div>
+    <div class="scale-legend"><span>전혀 아니다</span><span>매우 그렇다</span></div></div>`;
+}
+const _survey={};
+function setSurvey(id,v,btn){ _survey[id]=v; const row=btn.parentElement; row.querySelectorAll('button').forEach(b=>{b.classList.remove('on');b.style.background='';}); btn.classList.add('on'); btn.style.background='var(--brand-purple)'; }
+function onSat(){ _satTouched=true; document.getElementById('sat-val').textContent=document.getElementById('r-sat').value; }
+function setStar(n){ _star=n; document.querySelectorAll('#star-row span').forEach(s=>{ s.style.color = (+s.dataset.star<=n)?'#F5A623':'#E3DFF0'; }); }
+function onImagePick(input){
+  const f=input.files&&input.files[0]; if(!f) return;
+  const img=new Image(); const rd=new FileReader();
+  rd.onload=e=>{ img.onload=()=>{
+      const max=900; let w=img.width,hh=img.height;
+      if(w>max||hh>max){ if(w>hh){hh=Math.round(hh*max/w);w=max;}else{w=Math.round(w*max/hh);hh=max;} }
+      const c=document.createElement('canvas'); c.width=w; c.height=hh; c.getContext('2d').drawImage(img,0,0,w,hh);
+      _sogaImg=c.toDataURL('image/jpeg',0.72);
+      document.getElementById('img-preview').innerHTML=`<img src="${_sogaImg}" style="max-width:100%;max-height:220px;border-radius:12px;border:1px solid var(--border-default);">`;
+    }; img.src=e.target.result; };
+  rd.readAsDataURL(f);
+}
+function openSurvey(){
+  const c=document.getElementById('survey-cta'); if(c) c.style.display='none';
+  const b=document.getElementById('survey-block'); if(b){ b.style.display='block'; const card=b.parentElement; try{(card||b).scrollIntoView({behavior:'smooth',block:'start'});}catch(e){} }
+}
+function onFeedback(){
+  const fb=document.getElementById('r-feedback'); if(!fb) return;
+  const v=fb.value.trim();
+  const zone=document.getElementById('pdf-zone'); if(!zone) return;
+  if(v.length>=5 && _satTouched){
+    zone.innerHTML=`<button class="btn btn-primary btn-lg" onclick="savePdf()">📄 소감 보내고 결과 PDF 받기</button>
+      <p style="text-align:center;font-size:11px;color:var(--text-muted);margin-top:8px;">인쇄 창이 열리면 "PDF로 저장"을 선택하세요 · 소감·사진이 함께 담겨요</p>`;
+  }else{
+    zone.innerHTML=`<div class="pdf-cta">✍️ 만족도를 움직이고 소감을 남기면 <b>PDF 받기</b> 버튼이 나타나요.</div>`;
+  }
+}
+function collectSurvey(){
+  const em=document.getElementById('r-email2'), cs=document.getElementById('r-consent2');
+  STATE.survey={ satisfaction:(_survey.sat?_survey.sat*20:null),
+    q1:_survey.q1||null,q2:_survey.q2||null,q3:_survey.q3||null,q4:_survey.q4||null,
+    marketingEmail:em?em.value.trim():'', marketingConsent:cs?!!cs.checked:false };
+}
+async function submitSoga(){
+  const fb=document.getElementById('r-feedback'); const v=(fb?fb.value:'').trim();
+  if(!_star){ toast('별점을 먼저 선택해주세요'); const sr=document.getElementById('star-row'); if(sr) sr.scrollIntoView({behavior:'smooth',block:'center'}); return; }
+  if(!_survey.sat){ toast('첫 번째 문항(강점 활용도)에 답해주세요'); return; }
+  if(v.length<3){ toast('소감을 한 줄 남겨주세요'); if(fb) fb.focus(); return; }
+  collectSurvey();
+  await saveRecord();
+  if(!_fbSaved){ _fbSaved=true; await saveReview(v,_star||5,_sogaImg); }
+  const pf=document.getElementById('print-feedback');
+  if(pf){ pf.innerHTML=`<div class="card"><h2 style="font-size:16px;">나의 설문 & 소감</h2>
+    <p class="para" style="font-size:13px;">강점 활용도: <b>${STATE.survey.satisfaction}/100</b> · 별점 ${'★'.repeat(_star||5)}</p>
+    <p class="para" style="white-space:pre-wrap;">${esc(v)}</p>
+    ${_sogaImg?`<img src="${_sogaImg}" style="max-width:100%;max-height:320px;border-radius:12px;margin-top:8px;">`:''}</div>`; }
+  const inner=document.getElementById('survey-block');
+  const th=document.getElementById('thanks');
+  const _blk=document.getElementById('survey-block');
+  if(_blk){ Array.from(_blk.children).forEach(el=>{ if(el.id!=='thanks') el.style.display='none'; });
+    const _card=_blk.parentElement; if(_card){ Array.from(_card.children).forEach(el=>{ if(el!==_blk) el.style.display='none'; }); } }
+  if(th){ th.style.display='block'; th.innerHTML=`<div style="text-align:center;padding:20px 10px;">
+      <div style="font-size:44px;line-height:1;">💜</div>
+      <h2 style="margin-top:8px;">PBS 컬러와 함께 해주셔서<br>감사합니다!</h2>
+      <p class="sub" style="margin:10px auto;max-width:400px;">소중한 소감이 저장되었어요.${STATE.survey.marketingEmail?' 업데이트 자료도 이메일로 보내드릴게요 📩':''}<br>준비가 되면 아래 버튼을 눌러 결과를 PDF로 저장하세요 📄</p>
+      <button class="btn btn-primary btn-lg" style="max-width:340px;margin-top:10px;" onclick="window.print()">📄 지금 결과 PDF로 저장하기</button>
+    </div>`;
+    try{ th.scrollIntoView({behavior:'smooth',block:'center'}); }catch(e){}
+  }
+  toast('소감이 제출되었습니다. 감사합니다!');
+}
+async function savePdf(){
+  const v=document.getElementById('r-feedback').value.trim();
+  if(v.length<5||!_satTouched){ toast('만족도와 소감을 입력해주세요'); return; }
+  collectSurvey();
+  await saveRecord();
+  if(!_fbSaved){ _fbSaved=true; const rr=await saveReview(v,_star||5,_sogaImg); if(rr.ok) toast('설문·소감이 저장되었습니다'); }
+  // 인쇄 전용 블록 채우기
+  const pf=document.getElementById('print-feedback');
+  if(pf){ pf.innerHTML=`<div class="card"><h2 style="font-size:16px;">나의 설문 & 소감</h2>
+    <p class="para" style="font-size:13px;">강점 활용도: <b>${STATE.survey.satisfaction}/100</b></p>
+    <p class="para" style="white-space:pre-wrap;">${esc(v)}</p>
+    ${_sogaImg?`<img src="${_sogaImg}" style="max-width:100%;max-height:320px;border-radius:12px;margin-top:8px;">`:''}</div>`; }
+  setTimeout(()=>window.print(),350);
+}
+async function sendInquiry(){
+  const name=document.getElementById('i-name').value.trim();
+  const msg=document.getElementById('i-msg').value.trim();
+  if(!name||!msg){ toast('성함과 문의 내용을 입력해주세요'); return; }
+  const inq={type:document.getElementById('i-type').value,name:name,
+    phone:document.getElementById('i-phone').value.trim(),
+    email:document.getElementById('i-email').value.trim(),
+    org:'',message:msg};
+  const res=await saveInquiry(inq);
+  if(res.ok){ toast('문의가 접수되었습니다. 1~2일 내 회신드립니다.');
+    ['i-name','i-phone','i-email','i-msg'].forEach(id=>document.getElementById(id).value='');
+  }else{
+    const body=encodeURIComponent(`[문의유형] ${inq.type}\n[성함] ${name}\n[연락처] ${inq.phone}\n[이메일] ${inq.email}\n\n${msg}`);
+    toast('메일 앱으로 연결합니다'); window.location.href=`mailto:pbscolor77@naver.com?subject=${encodeURIComponent('[PBS 컬러강점] 교육 문의')}&body=${body}`;
+  }
+}
+function restart(){ if(!STATE._saved && STATE.result) saveRecord(); STATE.answers={}; STATE.user={}; STATE.result=null; STATE.recordId=null; STATE.startTs=Date.now(); STATE._saved=false; _fbSaved=false; _star=0; _satTouched=false; _sogaImg=null; STATE.survey=null; for(const k in _survey) delete _survey[k];
+  document.querySelectorAll('.scale button.on').forEach(b=>{b.classList.remove('on');b.style.background='';});
+  ['f-name','f-job','f-contact','f-date'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  const jg=document.getElementById('f-jobgroup'); if(jg) jg.value='';
+  const gd=document.getElementById('f-gender'); if(gd) gd.value='';
+  document.getElementById('f-age').value=''; document.getElementById('f-consent').checked=false;
+  updateProgress(); show('intro');
+}
+
+/* ============================================================
+   관리자
+   ============================================================ */
+function openAdmin(){ show('admin');
+  if(sessionStorage.getItem('pbs-admin-ok')==='1'){ document.getElementById('admin-lock').style.display='none'; document.getElementById('admin-panel').style.display='block'; loadAdminData(); }
+}
+function adminLogin(){
+  const pw=document.getElementById('admin-pw').value;
+  if(pw===ADMIN_PW){ sessionStorage.setItem('pbs-admin-ok','1');
+    document.getElementById('admin-lock').style.display='none';
+    document.getElementById('admin-panel').style.display='block';
+    document.getElementById('admin-err').textContent=''; loadAdminData();
+  }else{ document.getElementById('admin-err').textContent='비밀번호가 일치하지 않습니다.'; document.getElementById('admin-pw').value=''; }
+}
+function adminTab(t){
+  document.querySelectorAll('.tabbar button').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));
+  document.querySelectorAll('.admin-tab').forEach(el=>el.style.display='none');
+  document.getElementById('tab-'+t).style.display='block';
+  if(t==='code') loadCodes();
+  if(t==='all') loadAllStats();
+}
+
+/* ============================================================
+   강사코드 관리 (발급·목록·사용량·비활성화)
+   ============================================================ */
+let CODES=null;
+async function loadCodes(force){
+  if(CODES&&!force){ renderCodes(); return; }
+  const zone=document.getElementById('tab-code');
+  zone.innerHTML='<div class="card">불러오는 중...</div>';
+  if(!DBREADY){ zone.innerHTML='<div class="card">Supabase 연결이 필요합니다.</div>'; return; }
+  try{
+    const {data,error}=await DB.rpc('admin_codes',{p_pw:ADMIN_PW,p_action:'list',p_payload:{}});
+    if(error) throw error;
+    if(!data.ok) throw new Error(data.message||'인증 실패');
+    CODES=data.codes||[];
+    renderCodes();
+  }catch(e){ zone.innerHTML='<div class="card">코드 목록을 불러오지 못했습니다: '+esc(e.message||'')+'</div>'; }
+}
+function renderCodes(){
+  let h=`<div class="card">
+    <h2 style="font-size:16px;">새 강사코드 발급</h2>
+    <div class="grid2" style="margin-top:10px;">
+      <div class="field"><label>강사 이름 <span class="req">*</span></label><input id="c-name" type="text" maxlength="20" placeholder="예: 홍길동"></div>
+      <div class="field"><label>연락처</label><input id="c-phone" type="text" maxlength="20" placeholder="010-0000-0000"></div>
+    </div>
+    <div class="grid2">
+      <div class="field"><label>이메일</label><input id="c-email" type="text" maxlength="60"></div>
+      <div class="field"><label>소속</label><input id="c-org" type="text" maxlength="40"></div>
+    </div>
+    <div class="grid2">
+      <div class="field"><label>사용 가능 인원</label><input id="c-max" type="number" value="100" min="1"></div>
+      <div class="field"><label>유효기간 (개월)</label><input id="c-months" type="number" value="1" min="1" max="24"></div>
+    </div>
+    <button class="btn btn-primary" onclick="issueCode()">코드 발급하기</button>
+    <div id="c-result" style="margin-top:12px;"></div>
+  </div>`;
+  h+=`<div class="card"><h2 style="font-size:16px;">발급된 코드 (${(CODES||[]).length})</h2>
+    <div style="overflow-x:auto;margin-top:10px;">
+    <table style="width:100%;border-collapse:collapse;font-size:12.5px;">
+      <tr style="border-bottom:2px solid var(--border-default);text-align:left;">
+        <th style="padding:6px 8px;">코드</th><th style="padding:6px 8px;">강사/기관</th>
+        <th style="padding:6px 8px;">사용</th><th style="padding:6px 8px;">이번달</th>
+        <th style="padding:6px 8px;">만료일</th><th style="padding:6px 8px;">상태</th><th style="padding:6px 8px;"></th>
+      </tr>`;
+  (CODES||[]).forEach(c=>{
+    const exp=(c.valid_until||'').slice(0,10);
+    const expired=c.valid_until&&new Date(c.valid_until)<new Date();
+    const st=!c.is_active?'<span style="color:#C0392B;font-weight:800;">정지</span>':(expired?'<span style="color:#B7950B;font-weight:800;">만료</span>':'<span style="color:#1E8449;font-weight:800;">활성</span>');
+    h+=`<tr style="border-bottom:1px solid var(--border-default);">
+      <td style="padding:6px 8px;font-weight:800;white-space:nowrap;">${esc(c.code)}</td>
+      <td style="padding:6px 8px;">${esc(c.instructor_name||c.org_name||'-')}</td>
+      <td style="padding:6px 8px;white-space:nowrap;">${c.used_count}/${c.max_uses}</td>
+      <td style="padding:6px 8px;">${c.month_uses||0}</td>
+      <td style="padding:6px 8px;white-space:nowrap;">${exp}</td>
+      <td style="padding:6px 8px;">${st}</td>
+      <td style="padding:6px 8px;white-space:nowrap;">
+        <button class="btn btn-ghost" style="padding:4px 10px;font-size:11.5px;" onclick="toggleCode('${c.id}',${c.is_active?'false':'true'})">${c.is_active?'정지':'재개'}</button>
+        <button class="btn btn-ghost" style="padding:4px 10px;font-size:11.5px;" onclick="showUsage('${c.id}','${esc(c.code)}')">월별</button>
+      </td></tr>`;
+  });
+  h+=`</table></div><div id="c-usage" style="margin-top:12px;"></div></div>`;
+  document.getElementById('tab-code').innerHTML=h;
+}
+async function issueCode(){
+  const name=document.getElementById('c-name').value.trim();
+  if(!name){ toast('강사 이름을 입력해주세요'); return; }
+  const payload={ instructor_name:name,
+    instructor_phone:document.getElementById('c-phone').value.trim(),
+    instructor_email:document.getElementById('c-email').value.trim(),
+    org_name:document.getElementById('c-org').value.trim(),
+    max_uses:parseInt(document.getElementById('c-max').value)||100,
+    valid_months:parseInt(document.getElementById('c-months').value)||1 };
+  try{
+    const {data,error}=await DB.rpc('admin_codes',{p_pw:ADMIN_PW,p_action:'issue',p_payload:payload});
+    if(error) throw error;
+    if(!data.ok) throw new Error(data.message||'발급 실패');
+    document.getElementById('c-result').innerHTML=
+      `<div style="background:var(--brand-purple);color:#fff;border-radius:12px;padding:16px;text-align:center;">
+        <div style="font-size:12px;opacity:.85;">발급 완료 — 강사에게 이 코드를 전달하세요</div>
+        <div style="font-size:26px;font-weight:900;letter-spacing:2px;margin-top:4px;">${esc(data.code)}</div>
+        <div style="font-size:11.5px;opacity:.85;margin-top:4px;">유효기간 ${(data.valid_until||'').slice(0,10)}까지 · ${data.max_uses}명</div>
+      </div>`;
+    loadCodes(true);
+  }catch(e){ toast('발급 실패: '+(e.message||'')); }
+}
+async function toggleCode(id,active){
+  try{
+    const {data,error}=await DB.rpc('admin_codes',{p_pw:ADMIN_PW,p_action:'toggle',p_payload:{code_id:id,active:active==='true'||active===true}});
+    if(error) throw error;
+    if(!data.ok) throw new Error(data.message||'');
+    toast(data.is_active?'코드가 재개되었습니다':'코드가 정지되었습니다');
+    loadCodes(true);
+  }catch(e){ toast('변경 실패: '+(e.message||'')); }
+}
+async function showUsage(id,code){
+  const zone=document.getElementById('c-usage');
+  zone.innerHTML='불러오는 중...';
+  try{
+    const {data,error}=await DB.rpc('admin_codes',{p_pw:ADMIN_PW,p_action:'usage',p_payload:{code_id:id}});
+    if(error) throw error;
+    const rows=(data.usage||[]).map(u=>`<tr><td style="padding:4px 8px;">${u.month}</td><td style="padding:4px 8px;font-weight:800;">${u.uses}건</td></tr>`).join('');
+    zone.innerHTML=`<div style="border:1px solid var(--border-default);border-radius:12px;padding:12px;">
+      <b style="font-size:13px;">${esc(code)} 월별 사용량 (정산 근거)</b>
+      <table style="margin-top:6px;font-size:12.5px;">${rows||'<tr><td style="padding:4px 8px;">사용 기록 없음</td></tr>'}</table></div>`;
+  }catch(e){ zone.innerHTML='사용량 조회 실패'; }
+}
+
+/* ============================================================
+   전체 통계 (모든 경로 통합 — book48/paper_qr/online60)
+   ============================================================ */
+let ALLSTATS=null;
+const JG_LABEL={mgmt:'경영·관리',sales_mkt:'영업·마케팅',office_admin:'사무·행정',edu:'교육·강의',counsel_welfare:'상담·복지',it_tech:'IT·기술·연구',medical:'의료·보건',art_design:'예술·디자인',service_retail:'서비스·판매',production:'생산·현장',student:'학생',homemaker_etc:'주부·기타'};
+const PATH_LABEL={book48:'책 48문항',paper_qr:'QR 종이진단',online60:'온라인 60문항',legacy:'기존 기록'};
+async function loadAllStats(force){
+  if(ALLSTATS&&!force){ renderAllStats(); return; }
+  const zone=document.getElementById('tab-all');
+  zone.innerHTML='<div class="card">불러오는 중...</div>';
+  if(!DBREADY){ zone.innerHTML='<div class="card">Supabase 연결이 필요합니다.</div>'; return; }
+  try{
+    const {data,error}=await DB.from('pbs_records')
+      .select('entry_path,job_group,age_band,job_satisfaction,top_engine,created_at')
+      .order('created_at',{ascending:false}).limit(5000);
+    if(error) throw error;
+    ALLSTATS=data||[];
+    renderAllStats();
+  }catch(e){ zone.innerHTML='<div class="card">통계를 불러오지 못했습니다: '+esc(e.message||'')+'</div>'; }
+}
+function renderAllStats(){
+  const rows=ALLSTATS, total=rows.length;
+  const paths={}, jg={}, satHi={RED:0,YELLOW:0,GREEN:0,BLUE:0}, satLo={RED:0,YELLOW:0,GREEN:0,BLUE:0};
+  let hiN=0, loN=0;
+  rows.forEach(r=>{
+    const p=r.entry_path||'legacy'; paths[p]=(paths[p]||0)+1;
+    if(r.job_group){
+      if(!jg[r.job_group]) jg[r.job_group]={RED:0,YELLOW:0,GREEN:0,BLUE:0,_n:0};
+      if(r.top_engine&&jg[r.job_group][r.top_engine]!==undefined){ jg[r.job_group][r.top_engine]++; jg[r.job_group]._n++; }
+    }
+    if(r.job_satisfaction&&r.top_engine){
+      if(r.job_satisfaction>=4&&satHi[r.top_engine]!==undefined){ satHi[r.top_engine]++; hiN++; }
+      if(r.job_satisfaction<=2&&satLo[r.top_engine]!==undefined){ satLo[r.top_engine]++; loN++; }
+    }
+  });
+  let h=`<div class="stat-grid">
+    <div class="stat-box"><b>${total}</b><span>전체 진단 (모든 경로)</span></div>
+    ${Object.entries(paths).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<div class="stat-box"><b>${v}</b><span>${PATH_LABEL[k]||k}</span></div>`).join('')}
+  </div>`;
+  h+=`<div class="card"><h2 style="font-size:16px;">직군 × 대표 엔진 교차표</h2>
+    <p style="font-size:11px;color:var(--text-muted);margin:4px 0 10px;">표준 직군이 입력된 기록만 집계 (신규 진단부터 쌓입니다)</p>
+    <div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:12px;">
+    <tr style="border-bottom:2px solid var(--border-default);text-align:right;">
+      <th style="text-align:left;padding:6px;">직군</th>
+      <th style="padding:6px;color:${ENGINE_HEX.RED}">RED</th><th style="padding:6px;color:${ENGINE_HEX.YELLOW}">YELLOW</th>
+      <th style="padding:6px;color:${ENGINE_HEX.GREEN}">GREEN</th><th style="padding:6px;color:${ENGINE_HEX.BLUE}">BLUE</th>
+      <th style="padding:6px;">계</th></tr>`;
+  Object.entries(jg).sort((a,b)=>b[1]._n-a[1]._n).forEach(([k,v])=>{
+    h+=`<tr style="border-bottom:1px solid var(--border-default);text-align:right;">
+      <td style="text-align:left;padding:6px;font-weight:700;">${JG_LABEL[k]||k}</td>
+      <td style="padding:6px;">${v.RED}</td><td style="padding:6px;">${v.YELLOW}</td>
+      <td style="padding:6px;">${v.GREEN}</td><td style="padding:6px;">${v.BLUE}</td>
+      <td style="padding:6px;font-weight:800;">${v._n}</td></tr>`;
+  });
+  if(!Object.keys(jg).length) h+=`<tr><td colspan="6" style="padding:10px;color:var(--text-muted);">아직 표준 직군 데이터가 없습니다</td></tr>`;
+  h+=`</table></div></div>`;
+  h+=`<div class="card"><h2 style="font-size:16px;">직무 만족도 그룹별 컬러 분포</h2>
+    <p style="font-size:11px;color:var(--text-muted);margin:4px 0 10px;">만족 그룹(4~5점) vs 불만족 그룹(1~2점)의 대표 엔진 비교</p>`;
+  [['😊 만족 그룹 (4~5점)',satHi,hiN],['😔 불만족 그룹 (1~2점)',satLo,loN]].forEach(pair=>{
+    const label=pair[0],obj=pair[1],n=pair[2];
+    h+=`<div style="font-size:12.5px;font-weight:800;margin:12px 0 6px;">${label} · ${n}명</div>`;
+    ['RED','YELLOW','GREEN','BLUE'].forEach(e=>{
+      const c=obj[e], pct=n?Math.round(c/n*100):0;
+      h+=`<div class="dist-row"><div class="dl" style="color:${ENGINE_HEX[e]}">${e}</div>
+        <div class="dist-track"><div class="dist-fill" style="width:${Math.max(pct,4)}%;background:${ENGINE_HEX[e]}">${c}명</div></div>
+        <div style="width:40px;text-align:right;font-weight:800;">${pct}%</div></div>`;
+    });
+  });
+  h+=`<p style="font-size:11px;color:var(--text-muted);margin-top:8px;">만족도는 설문 응답 기록만 집계됩니다.</p></div>`;
+  document.getElementById('tab-all').innerHTML=h;
+}
+
+let ADMIN={records:[],inquiries:[],reviews:[]};
+async function loadAdminData(){
+  if(!DBREADY){ document.getElementById('tab-stat').innerHTML='<div class="card">Supabase 연결이 필요합니다.</div>'; return; }
+  document.getElementById('tab-stat').innerHTML='<div class="card">불러오는 중...</div>';
+  try{
+    const [rec,inq,rev]=await Promise.all([
+      DB.from('pbs_records').select('*').eq('test_type',TEST_TYPE).order('created_at',{ascending:false}).limit(1000),
+      DB.from('pbs_inquiries').select('*').order('created_at',{ascending:false}).limit(500),
+      DB.from('pbs_reviews').select('*').order('created_at',{ascending:false}).limit(500)
+    ]);
+    ADMIN.records=rec.data||[]; ADMIN.inquiries=(inq.data||[]).filter(q=>q.center_slug==='pbs_paper');
+    // 이 현장진단 프로그램에서 남긴 소감만 필터 (record_id가 본 프로그램 기록에 속하는 것)
+    const recIds=new Set(ADMIN.records.map(r=>r.id));
+    ADMIN.reviews=(rev.data||[]).filter(rv=>rv.record_id && recIds.has(rv.record_id));
+  }catch(e){ console.warn(e); }
+  renderStat(); renderInq(); renderRev();
+}
+function inqHandled(id){ try{ return (JSON.parse(localStorage.getItem('pbs-inq-handled')||'[]')).includes(id); }catch(e){ return false; } }
+function setInqHandled(id,on){ try{ let a=JSON.parse(localStorage.getItem('pbs-inq-handled')||'[]'); if(on){ if(!a.includes(id)) a.push(id);} else { a=a.filter(x=>x!==id);} localStorage.setItem('pbs-inq-handled',JSON.stringify(a)); }catch(e){} }
+function toggleStat(el){ const b=el.parentElement.querySelector('.stat-body'); if(!b) return; const open=b.style.display!=='none'; b.style.display=open?'none':'block'; const ar=el.querySelector('.stat-arrow'); if(ar) ar.textContent=open?'▸':'▾'; }
+function renderStat(){
+  const recs=ADMIN.records;
+  const total=recs.length;
+  const ages={},jobs={},engines={RED:0,YELLOW:0,GREEN:0,BLUE:0};
+  recs.forEach(r=>{
+    const a=r.user_age?(Math.floor(r.user_age/10)*10+'대'):'미상'; ages[a]=(ages[a]||0)+1;
+    const j=(r.user_job||'미상').trim()||'미상'; jobs[j]=(jobs[j]||0)+1;
+    if(r.top_engine&&engines[r.top_engine]!==undefined) engines[r.top_engine]++;
+  });
+  const withFb=ADMIN.reviews.length;
+  let h=`<div class="stat-grid">
+    <div class="stat-box"><b>${total}</b><span>총 진단 수</span></div>
+    <div class="stat-box"><b>${ADMIN.inquiries.length}</b><span>문의</span></div>
+    <div class="stat-box"><b>${withFb}</b><span>소감</span></div>
+    <div class="stat-box"><b>${Object.keys(jobs).filter(k=>k!=='미상').length}</b><span>소속 종류</span></div>
+  </div>`;
+  h+=`<div class="card"><h2 style="font-size:16px;">대표 엔진 분포</h2><div style="margin-top:12px;">`;
+  const emax=Math.max(1,...Object.values(engines));
+  ['RED','YELLOW','GREEN','BLUE'].forEach(e=>{
+    const c=engines[e], pct=total?Math.round(c/total*100):0;
+    h+=`<div class="dist-row"><div class="dl" style="color:${ENGINE_HEX[e]}">${e}</div>
+      <div class="dist-track"><div class="dist-fill" style="width:${Math.max(c/emax*100,6)}%;background:${ENGINE_HEX[e]}">${c}명</div></div>
+      <div style="width:40px;text-align:right;font-weight:800;">${pct}%</div></div>`;
+  });
+  h+=`</div></div>`;
+  h+=`<div class="card"><h2 style="font-size:16px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;" onclick="toggleStat(this)">연령대 분포 <span class="stat-arrow">▸</span></h2><div class="stat-body" style="display:none;margin-top:12px;">`;
+  const amax=Math.max(1,...Object.values(ages));
+  Object.entries(ages).sort((a,b)=>b[1]-a[1]).forEach(([k,v])=>{
+    h+=`<div class="dist-row"><div class="dl">${k}</div><div class="dist-track"><div class="dist-fill" style="width:${Math.max(v/amax*100,6)}%;background:var(--brand-purple)">${v}</div></div></div>`;
+  });
+  h+=`</div></div>`;
+  h+=`<div class="card"><h2 style="font-size:16px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;" onclick="toggleStat(this)">소속·직업 분포 (상위 12) <span class="stat-arrow">▸</span></h2><div class="stat-body" style="display:none;margin-top:12px;">`;
+  const jsorted=Object.entries(jobs).filter(([k])=>k!=='미상').sort((a,b)=>b[1]-a[1]).slice(0,12);
+  const jmax=Math.max(1,...jsorted.map(x=>x[1]));
+  if(jsorted.length===0) h+='<p style="font-size:13px;color:var(--text-muted)">데이터 없음</p>';
+  jsorted.forEach(([k,v])=>{
+    h+=`<div class="dist-row"><div class="dl" style="width:120px;">${esc(k)}</div><div class="dist-track"><div class="dist-fill" style="width:${Math.max(v/jmax*100,6)}%;background:var(--brand-indigo)">${v}</div></div></div>`;
+  });
+  h+=`</div></div>`;
+  // ---- 직업군별 대표 엔진 분포 ----
+  const jgMap={};
+  recs.forEach(r=>{ const jg=(r.scores&&r.scores.job_group)||'미분류'; const e=r.top_engine; if(!jgMap[jg]) jgMap[jg]={RED:0,YELLOW:0,GREEN:0,BLUE:0,_n:0}; if(e&&jgMap[jg][e]!==undefined){jgMap[jg][e]++;jgMap[jg]._n++;} });
+  h+=`<div class="card"><h2 style="font-size:16px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;" onclick="toggleStat(this)">직업군별 컬러 엔진 분포 <span class="stat-arrow">▸</span></h2>
+    <div class="stat-body" style="display:none;"><p style="font-size:11px;color:var(--text-muted);margin:4px 0 12px;">각 직업군에서 어떤 컬러 엔진이 많은지 (막대=대표엔진 인원)</p>`;
+  const jgKeys=Object.keys(jgMap).filter(k=>jgMap[k]._n>0).sort((a,b)=>jgMap[b]._n-jgMap[a]._n);
+  if(!jgKeys.length) h+='<p style="font-size:13px;color:var(--text-muted)">데이터 없음</p>';
+  jgKeys.forEach(jg=>{
+    const m=jgMap[jg]; const top=['RED','YELLOW','GREEN','BLUE'].sort((a,b)=>m[b]-m[a])[0];
+    h+=`<div style="margin-bottom:12px;"><div style="font-size:13px;font-weight:800;margin-bottom:4px;">${esc(jg)} <span style="font-size:11px;color:var(--text-muted);font-weight:600;">(${m._n}명 · 대표 <span style="color:${ENGINE_HEX[top]}">${top}</span>)</span></div>
+      <div style="display:flex;height:20px;border-radius:6px;overflow:hidden;background:var(--bg-muted);">`;
+    ['RED','YELLOW','GREEN','BLUE'].forEach(e=>{ const w=m._n?m[e]/m._n*100:0; if(w>0) h+=`<div style="width:${w}%;background:${ENGINE_HEX[e]}" title="${e} ${m[e]}"></div>`; });
+    h+=`</div></div>`;
+  });
+  h+=`</div></div>`;
+  // ---- 강점 활용 만족도(0~100) 통계 ----
+  const sats=recs.filter(r=>r.scores&&r.scores.satisfaction!=null);
+  if(sats.length){
+    const avg=Math.round(sats.reduce((s,r)=>s+r.scores.satisfaction,0)/sats.length);
+    const hi=sats.filter(r=>r.scores.satisfaction>=70), lo=sats.filter(r=>r.scores.satisfaction<40);
+    const engDist=(rows)=>{ const d={RED:0,YELLOW:0,GREEN:0,BLUE:0}; rows.forEach(r=>{if(d[r.top_engine]!==undefined)d[r.top_engine]++;}); const t=rows.length||1; return ['RED','YELLOW','GREEN','BLUE'].map(e=>`<span style="color:${ENGINE_HEX[e]};font-weight:800;">${e} ${Math.round(d[e]/t*100)}%</span>`).join(' · '); };
+    h+=`<div class="card"><h2 style="font-size:16px;">강점 활용 만족도 (0~100)</h2>
+      <p style="font-size:13px;margin:8px 0;">응답 ${sats.length}명 · 평균 <b style="color:var(--brand-purple);font-size:18px;">${avg}점</b></p>
+      <div style="background:var(--engine-green-bg);border-radius:10px;padding:12px;margin-bottom:8px;"><div style="font-weight:800;font-size:13px;color:var(--engine-green);">잘 활용(70점↑) ${hi.length}명</div><div style="font-size:12px;margin-top:4px;">${hi.length?engDist(hi):'데이터 없음'}</div></div>
+      <div style="background:var(--engine-red-bg);border-radius:10px;padding:12px;"><div style="font-weight:800;font-size:13px;color:var(--engine-red);">활용 낮음(40점↓) ${lo.length}명</div><div style="font-size:12px;margin-top:4px;">${lo.length?engDist(lo):'데이터 없음'}</div></div>
+      <p style="font-size:11px;color:var(--text-muted);margin-top:10px;">직업군별 평균 활용도</p>`;
+    const jgSat={}; sats.forEach(r=>{ const jg=(r.scores.job_group)||'미분류'; if(!jgSat[jg]){jgSat[jg]={s:0,n:0};} jgSat[jg].s+=r.scores.satisfaction; jgSat[jg].n++; });
+    Object.entries(jgSat).sort((a,b)=>(b[1].s/b[1].n)-(a[1].s/a[1].n)).forEach(([jg,o])=>{ const av=Math.round(o.s/o.n); h+=`<div class="dist-row"><div class="dl" style="width:110px;">${esc(jg)}</div><div class="dist-track"><div class="dist-fill" style="width:${Math.max(av,6)}%;background:var(--brand-gradient)">${av}</div></div><div style="width:36px;font-size:11px;color:var(--text-muted);">${o.n}명</div></div>`; });
+    h+=`</div>`;
+  }
+  h+=`<div style="text-align:center;"><button class="mini-btn" onclick="exportCsv()">📊 진단 데이터 CSV 내보내기</button></div>`;
+  document.getElementById('tab-stat').innerHTML=h;
+}
+function renderInq(){
+  const arr=ADMIN.inquiries;
+  const TYPES={lecture:'강의',consulting:'컨설팅',certification:'자격과정',partnership:'협력',general:'기타'};
+  let h=`<h2 style="font-size:16px;margin-bottom:12px;">문의 관리 (${arr.length})</h2>`;
+  if(!arr.length) h+='<div class="card">접수된 문의가 없습니다.</div>';
+  arr.forEach(q=>{
+    const done=inqHandled(q.id);
+    const replyBody=encodeURIComponent(`안녕하세요 ${q.name||''}님,\n\nPBS COLOR LAB 최해숙입니다. 문의 주셔서 감사합니다.\n\n`);
+    h+=`<div class="admin-item">
+      <div class="ai-head">
+        <span class="ai-name">${esc(q.name||'익명')} <span class="badge-tag" style="background:var(--brand-purple)">${TYPES[q.inquiry_type]||q.inquiry_type||'문의'}</span> ${done?'<span class="badge-tag" style="background:var(--engine-green)">확인</span>':'<span class="badge-tag" style="background:var(--engine-red)">신규</span>'}</span>
+        <span class="ai-meta">${fmtDate(q.created_at)}</span>
+      </div>
+      <div class="ai-meta" style="margin-bottom:6px;">${q.phone?'📞 '+esc(q.phone)+'  ':''}${q.email?'✉️ '+esc(q.email):''}</div>
+      <div class="ai-body">${esc(q.message||q.msg||'')}</div>
+      <div class="ai-actions">
+        <button class="mini-btn ${done?'':'pri'}" onclick="toggleInqHandled('${q.id}',${!done})">${done?'신규로 되돌리기':'확인 표시'}</button>
+        ${q.email?`<a class="mini-btn" href="mailto:${esc(q.email)}?subject=${encodeURIComponent('[PBS 컬러강점] 문의 회신')}&body=${replyBody}">✉️ 답장</a>`:''}
+        ${q.phone?`<a class="mini-btn" href="tel:${esc((q.phone||'').replace(/[^0-9]/g,''))}">📞 전화</a>`:''}
+        <button class="mini-btn danger" onclick="delInq('${q.id}')">삭제</button>
+      </div>
+    </div>`;
+  });
+  document.getElementById('tab-inq').innerHTML=h;
+}
+function renderRev(){
+  const arr=ADMIN.reviews;
+  let h=`<h2 style="font-size:16px;margin-bottom:6px;">소감 관리 (${arr.length})</h2>
+    <p style="font-size:12px;color:var(--text-muted);margin-bottom:12px;">"노출"로 설정한 소감만 후기로 공개됩니다.</p>`;
+  if(!arr.length) h+='<div class="card">등록된 소감이 없습니다.</div>';
+  arr.forEach(rv=>{
+    const feat=rv.is_featured;
+    const raw=rv.text||''; const parts=raw.split('[[PBS_IMG]]');
+    const body=parts[0].trim(); const img=parts[1]||'';
+    const rec=ADMIN.records.find(x=>x.id===rv.record_id);
+    const stars='★'.repeat(rv.stars||0)+'☆'.repeat(5-(rv.stars||0));
+    const meta=rec?`${rec.top_engine||''} · ${(rec.scores&&rec.scores.job_group)||''}${(rec.scores&&rec.scores.satisfaction!=null)?' · 활용도 '+rec.scores.satisfaction:''}`:'';
+    h+=`<div class="admin-item">
+      <div class="ai-head">
+        <span class="ai-name">${esc(rv.name||'익명')} ${feat?'<span class="badge-tag" style="background:var(--engine-green)">노출중</span>':'<span class="badge-tag" style="background:var(--text-muted)">비공개</span>'}</span>
+        <span class="ai-meta">${fmtDate(rv.created_at)}</span>
+      </div>
+      <div class="ai-meta" style="margin-bottom:5px;">${'<span style=\'color:#F5A623\'>'+stars+'</span>'} ${meta?'· '+esc(meta):''}</div>
+      <div class="ai-body">${esc(body)}</div>
+      ${img?`<img src="${img}" style="max-width:100%;max-height:220px;border-radius:10px;margin-top:8px;border:1px solid var(--border-subtle);">`:''}
+      <div class="ai-actions">
+        <button class="mini-btn ${feat?'':'pri'}" onclick="toggleRev('${rv.id}',${!feat})">${feat?'비공개로':'후기로 노출'}</button>
+        <button class="mini-btn danger" onclick="delRev('${rv.id}')">삭제</button>
+      </div>
+    </div>`;
+  });
+  document.getElementById('tab-rev').innerHTML=h;
+}
+function toggleInqHandled(id,on){ setInqHandled(id,on); renderInq(); toast(on?'확인 표시했습니다':'신규로 되돌렸습니다'); }
+async function delInq(id){
+  if(!DBREADY||!confirm('이 문의를 삭제할까요?')) return;
+  const {error}=await DB.rpc('admin_delete_inquiry',{p_id:id,p_secret:ADMIN_PW});
+  if(error){ toast('삭제 실패'); return; }
+  ADMIN.inquiries=ADMIN.inquiries.filter(x=>x.id!==id); renderInq(); toast('삭제되었습니다');
+}
+async function toggleRev(id,feat){
+  if(!DBREADY) return;
+  const {error}=await DB.rpc('set_review_featured',{p_id:id,p_featured:feat});
+  if(error){ toast('변경 실패'); return; }
+  const it=ADMIN.reviews.find(x=>x.id===id); if(it) it.is_featured=feat; renderRev(); toast(feat?'후기로 공개되었습니다':'비공개 처리되었습니다');
+}
+async function delRev(id){
+  if(!DBREADY||!confirm('이 소감을 삭제할까요?')) return;
+  const {error}=await DB.rpc('admin_delete_review',{p_id:id,p_secret:ADMIN_PW});
+  if(error){ toast('삭제 실패'); return; }
+  ADMIN.reviews=ADMIN.reviews.filter(x=>x.id!==id); renderRev(); toast('삭제되었습니다');
+}
+function exportCsv(){
+  const rows=[['입력일시','진단날짜','직업군','이름','연령','소속','연락처','이메일','자료수신이메일','대표엔진','1위기어','강점활용도','설문공감','직무만족','자기이해','추천의향',...ALL_GEARS]];
+  ADMIN.records.forEach(r=>{
+    const g=(r.scores&&r.scores.gears)||{}; const sc=r.scores||{}; const sv=sc.survey||{};
+    const dd=sc.diag_date||''; const jg=sc.job_group||'';
+    rows.push([fmtDate(r.created_at),dd,jg,r.user_name||'',r.user_age||'',r.user_job||'',r.user_phone||'',r.user_email||'',sc.marketing_email||'',r.top_engine||'',r.top_gear||'',sc.satisfaction!=null?sc.satisfaction:'',sv.q1||'',sv.q2||'',sv.q3||'',sv.q4||'',...ALL_GEARS.map(k=>g[k]!=null?g[k]:'')]);
+  });
+  const csv='﻿'+rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob=new Blob([csv],{type:'text/csv'}); const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download=`pbs_paper_records_${new Date().toISOString().slice(0,10)}.csv`; a.click(); URL.revokeObjectURL(url);
+}
+function fmtDate(d){ if(!d) return ''; const dt=new Date(d); return dt.toLocaleDateString('ko-KR',{month:'2-digit',day:'2-digit'})+' '+dt.toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'}); }
+
+// hash routing
+if(location.hash==='#admin'){ openAdmin(); }
+window.addEventListener('hashchange',()=>{ if(location.hash==='#admin') openAdmin(); });
+</script>
+</body>
+</html>
