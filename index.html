@@ -96,6 +96,16 @@ body{font-family:var(--font);background:var(--bg-page);color:var(--text-primary)
 .scale button:hover{border-color:var(--brand-purple);}
 .scale button.on{color:#fff;border-color:transparent;transform:scale(1.04);box-shadow:var(--shadow-sm);}
 .scale-legend{display:flex;justify-content:space-between;font-size:10.5px;color:var(--text-muted);margin-top:6px;font-weight:600;}
+/* --- 모바일 설문 문항 가독성: 질문은 크게, 1~5 숫자는 살짝 작게 --- */
+.sv-q{margin-bottom:16px;}
+.sv-q>label{font-size:15.5px;font-weight:800;line-height:1.55;color:var(--text-primary);margin-bottom:10px;}
+.sv-q .scale{gap:7px;}
+.sv-q .scale button{font-size:14px;padding:12px 0;font-weight:700;}
+.sv-q .scale-legend{font-size:11px;}
+@media(max-width:520px){
+  .sv-q>label{font-size:16px;}
+  .sv-q .scale button{font-size:13.5px;padding:11px 0;}
+}
 .sticky-cta{position:sticky;bottom:0;background:linear-gradient(to top,var(--bg-page) 70%,transparent);padding:16px 0 20px;z-index:30;}
 /* result */
 .result-hero{text-align:center;padding:30px 0 10px;}
@@ -138,13 +148,14 @@ body{font-family:var(--font);background:var(--bg-page);color:var(--text-primary)
 /* profile */
 .profile-card{background:var(--brand-gradient);color:#fff;border-radius:var(--r-xl);padding:26px 22px;}
 .profile-card h2{font-size:20px;font-weight:900;margin-bottom:4px;}
-.profile-card .ptitle{font-size:13px;opacity:.85;margin-bottom:16px;}
+.profile-card h2{font-size:23px;}
+.profile-card .ptitle{font-size:14px;opacity:.9;margin-bottom:16px;}
 .profile-card .pquote{font-size:14px;font-style:italic;opacity:.95;border-left:3px solid rgba(255,255,255,.4);padding-left:12px;margin-bottom:18px;line-height:1.55;}
 .pstats{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;}
 .pstat{flex:1;min-width:90px;background:rgba(255,255,255,.12);border-radius:var(--r-md);padding:12px;text-align:center;}
 .pstat b{display:block;font-size:20px;font-weight:900;}
 .pstat span{font-size:11px;opacity:.85;}
-.pbio{font-size:13px;opacity:.92;line-height:1.6;}
+.pbio{font-size:13.5px;opacity:.96;line-height:1.65;}
 .pbio li{list-style:none;padding:4px 0;padding-left:16px;position:relative;}
 .pbio li::before{content:"✦";position:absolute;left:0;opacity:.7;}
 /* contact channels */
@@ -319,7 +330,7 @@ body{font-family:var(--font);background:var(--bg-page);color:var(--text-primary)
     <div class="card">
       <div class="eyebrow">Step 2 / 3</div>
       <h2>종이진단 점수 입력</h2>
-      <p class="sub">종이 진단지에서 <b>12개 색상 조각(기어)별 합산 점수</b>를 <b>0~25점</b> 숫자로 입력하세요. 합산 값만 있으면 바로 상세 결과를 볼 수 있습니다.</p>
+      <p class="sub">종이 진단지에서 <b>12개 색상 조각(기어)별 합산 점수</b>를 <b>5~25점</b> 숫자로 입력하세요. 점수를 입력하면 <b>자동으로 다음 칸으로 이동</b>합니다. 합산 값만 있으면 바로 상세 결과를 볼 수 있습니다.</p>
       <div id="summary-body"></div>
       <div class="sticky-cta">
         <button class="btn btn-primary btn-lg" onclick="goSummaryResult()">결과 확인하기 →</button>
@@ -397,96 +408,96 @@ body{font-family:var(--font);background:var(--bg-page);color:var(--text-primary)
 
 <script>
 const QUESTIONS = [
-  // RED-R1: 본능적 추진
+  // RED-R1: 도전
   {id:1,  gear:'R1', cat:'목표·시작', text:'목표가 생기면 깊이 고민하지 않고 바로 행동을 시작하는 편이다.', deep:false},
   {id:2,  gear:'R1', cat:'속도·즉시성', text:'도전적인 상황에서 오히려 에너지가 솟아오른다.', deep:false},
   {id:3,  gear:'R1', cat:'결정·실행', text:'어떤 일이든 빨리 결정하고 실행하는 것이 답답한 회의보다 훨씬 좋다.', deep:false},
   {id:4,  gear:'R1', cat:'본능·적응', text:'변화나 새로운 환경에 빠르게 적응하고 그 안에서 즐긴다.', deep:false},
-  {id:5,  gear:'R1', cat:'★심화: 본능적 추진', text:'"되는지 안 되는지는 해봐야 안다"는 말에 깊이 공감한다.', deep:true},
-  // RED-R2: 결과 지향 리더십
+  {id:5,  gear:'R1', cat:'★심화: 도전', text:'"되는지 안 되는지는 해봐야 안다"는 말에 깊이 공감한다.', deep:true},
+  // RED-R2: 열정
   {id:6,  gear:'R2', cat:'몰입·집중', text:'목표를 향해 나아갈 때 주변의 잡음에 흔들리지 않는다.', deep:false},
   {id:7,  gear:'R2', cat:'성과·가치', text:'결과를 만들어내는 사람이 가장 가치 있다고 생각한다.', deep:false},
   {id:8,  gear:'R2', cat:'리더십·방향', text:'팀이 막힐 때 내가 방향을 제시하고 이끌어가는 편이다.', deep:false},
   {id:9,  gear:'R2', cat:'도전·전투력', text:'어려운 도전일수록 더 해보고 싶어진다.', deep:false},
-  {id:10, gear:'R2', cat:'★심화: 결과 지향', text:'일을 끝내지 못하고 중단되는 것을 견디기 어렵다.', deep:true},
-  // RED-R3: 완성 에너지
-  {id:11, gear:'R3', cat:'완결·마무리', text:'한번 시작한 일은 끝까지 마무리해야 직성이 풀린다.', deep:false},
+  {id:10, gear:'R2', cat:'★심화: 열정', text:'일을 끝내지 못하고 중단되는 것을 견디기 어렵다.', deep:true},
+  // RED-R3: 성과
+  {id:11, gear:'R3', cat:'성과·마무리', text:'한번 시작한 일은 끝까지 마무리해야 직성이 풀린다.', deep:false},
   {id:12, gear:'R3', cat:'멀티태스킹', text:'여러 일을 동시에 처리하면서도 집중력을 유지할 수 있다.', deep:false},
   {id:13, gear:'R3', cat:'성과·동기', text:'성과가 눈에 보이는 일에 더 큰 동기를 느낀다.', deep:false},
   {id:14, gear:'R3', cat:'마감·집중력', text:'마감이 다가오면 오히려 집중력이 폭발한다.', deep:false},
-  {id:15, gear:'R3', cat:'★심화: 완성', text:'시작과 끝이 명확한 프로젝트가 가장 만족스럽다.', deep:true},
+  {id:15, gear:'R3', cat:'★심화: 성과', text:'시작과 끝이 명확한 프로젝트가 가장 만족스럽다.', deep:true},
 
-  // YELLOW-Y1: 연결의 본능
+  // YELLOW-Y1: 발견
   {id:16, gear:'Y1', cat:'관계·시작', text:'처음 만난 사람과도 자연스럽게 대화를 시작한다.', deep:false},
   {id:17, gear:'Y1', cat:'네트워킹', text:'사람들 사이의 관계를 연결하고 모임을 만드는 것이 즐겁다.', deep:false},
   {id:18, gear:'Y1', cat:'사회 에너지', text:'새로운 사람을 만나는 것이 나에게 에너지를 충전시켜준다.', deep:false},
   {id:19, gear:'Y1', cat:'관계 유지', text:'다양한 사람들과 친분을 오래 유지하는 능력이 있다.', deep:false},
-  {id:20, gear:'Y1', cat:'★심화: 연결', text:'"함께하면 더 커진다"는 말에 깊이 공감한다.', deep:true},
-  // YELLOW-Y2: 따뜻한 소통
+  {id:20, gear:'Y1', cat:'★심화: 발견', text:'"함께하면 더 커진다"는 말에 깊이 공감한다.', deep:true},
+  // YELLOW-Y2: 공감
   {id:21, gear:'Y2', cat:'감정 인식', text:'상대방의 감정 변화를 빠르게 읽어낸다.', deep:false},
   {id:22, gear:'Y2', cat:'분위기 전환', text:'따뜻한 말 한마디로 무거운 분위기를 바꾸는 능력이 있다.', deep:false},
   {id:23, gear:'Y2', cat:'중재·조율', text:'갈등 상황에서 중재자 역할을 자연스럽게 맡는다.', deep:false},
   {id:24, gear:'Y2', cat:'경청·공감', text:'다른 사람의 이야기에 깊이 공감하며 듣는다.', deep:false},
-  {id:25, gear:'Y2', cat:'★심화: 공감 신뢰', text:'사람들이 나에게 고민을 털어놓는 경우가 많다.', deep:true},
-  // YELLOW-Y3: 창의적 표현
+  {id:25, gear:'Y2', cat:'★심화: 공감', text:'사람들이 나에게 고민을 털어놓는 경우가 많다.', deep:true},
+  // YELLOW-Y3: 창의
   {id:26, gear:'Y3', cat:'아이디어', text:'새로운 아이디어가 끊임없이 떠오르는 편이다.', deep:false},
   {id:27, gear:'Y3', cat:'표현력', text:'같은 내용도 더 흥미롭게 표현하는 능력이 있다.', deep:false},
   {id:28, gear:'Y3', cat:'창의·독창성', text:'창의적이거나 독창적인 일에서 진가를 발휘한다.', deep:false},
   {id:29, gear:'Y3', cat:'긍정 에너지', text:'분위기를 밝게 만들고 사람들을 즐겁게 하는 것을 좋아한다.', deep:false},
-  {id:30, gear:'Y3', cat:'★심화: 창의 표현', text:'표현하지 못하면 답답해서 견디기 어렵다.', deep:true},
+  {id:30, gear:'Y3', cat:'★심화: 창의', text:'표현하지 못하면 답답해서 견디기 어렵다.', deep:true},
 
-  // GREEN-G1: 평화
-  {id:31, gear:'G1', cat:'긴장 완화', text:'어색하거나 긴장된 자리를 자연스럽게 편안하게 만든다.', deep:false},
-  {id:32, gear:'G1', cat:'안정감', text:'내가 있으면 사람들이 마음을 놓고 편안해한다는 말을 듣는다.', deep:false},
-  {id:33, gear:'G1', cat:'분위기 조성', text:'갈등이나 날카로운 분위기를 부드럽게 가라앉히는 편이다.', deep:false},
-  {id:34, gear:'G1', cat:'배려·수용', text:'상대가 불편하지 않도록 먼저 살피고 맞춰준다.', deep:false},
-  {id:35, gear:'G1', cat:'★심화: 평화의 본능', text:'"함께 있는 자리가 편안해야 한다"는 말에 깊이 공감한다.', deep:true},
-  // GREEN-G2: 성장
-  {id:36, gear:'G2', cat:'회복 지원', text:'힘들어하는 사람이 다시 일어서도록 곁에서 돕는 편이다.', deep:false},
-  {id:37, gear:'G2', cat:'잠재력 발견', text:'상대의 가능성을 먼저 발견하고 키워주는 것이 즐겁다.', deep:false},
-  {id:38, gear:'G2', cat:'멘토링', text:'누군가의 성장을 돕는 일에서 큰 보람을 느낀다.', deep:false},
-  {id:39, gear:'G2', cat:'기다림·지지', text:'상대가 스스로 해낼 때까지 믿고 기다려주는 편이다.', deep:false},
-  {id:40, gear:'G2', cat:'★심화: 다시 세우는 힘', text:'넘어진 사람을 다시 일으켜 세운 경험이 나에게 큰 의미가 있다.', deep:true},
+  // GREEN-G2: 평화 (문항 31~35)
+  {id:31, gear:'G2', cat:'긴장 완화', text:'어색하거나 긴장된 자리를 자연스럽게 편안하게 만든다.', deep:false},
+  {id:32, gear:'G2', cat:'안정감', text:'내가 있으면 사람들이 마음을 놓고 편안해한다는 말을 듣는다.', deep:false},
+  {id:33, gear:'G2', cat:'분위기 조성', text:'갈등이나 날카로운 분위기를 부드럽게 가라앉히는 편이다.', deep:false},
+  {id:34, gear:'G2', cat:'조율·수용', text:'상대가 불편하지 않도록 먼저 살피고 맞춰준다.', deep:false},
+  {id:35, gear:'G2', cat:'★심화: 평화', text:'"함께 있는 자리가 편안해야 한다"는 말에 깊이 공감한다.', deep:true},
+  // GREEN-G1: 배려 (문항 36~40)
+  {id:36, gear:'G1', cat:'회복 지원', text:'힘들어하는 사람이 다시 일어서도록 곁에서 돕는 편이다.', deep:false},
+  {id:37, gear:'G1', cat:'잠재력 발견', text:'상대의 가능성을 먼저 발견하고 키워주는 것이 즐겁다.', deep:false},
+  {id:38, gear:'G1', cat:'멘토링', text:'누군가의 성장을 돕는 일에서 큰 보람을 느낀다.', deep:false},
+  {id:39, gear:'G1', cat:'기다림·지지', text:'상대가 스스로 해낼 때까지 믿고 기다려주는 편이다.', deep:false},
+  {id:40, gear:'G1', cat:'★심화: 배려', text:'넘어진 사람을 다시 일으켜 세운 경험이 나에게 큰 의미가 있다.', deep:true},
   // GREEN-G3: 밸런스
   {id:41, gear:'G3', cat:'균형 감각', text:'어느 한쪽으로 치우치지 않고 균형을 잡으려 한다.', deep:false},
   {id:42, gear:'G3', cat:'공존 지향', text:'나의 이익과 공동체의 이익을 함께 고려하는 편이다.', deep:false},
   {id:43, gear:'G3', cat:'지속 가능성', text:'당장의 이익보다 오래 지속될 수 있는 방향을 선택한다.', deep:false},
   {id:44, gear:'G3', cat:'조화 조정', text:'서로 다른 입장 사이에서 모두가 살 길을 찾아낸다.', deep:false},
-  {id:45, gear:'G3', cat:'★심화: 함께 사는 지혜', text:'"나도 살고 우리도 사는 길"을 찾는 것이 나의 강점이다.', deep:true},
+  {id:45, gear:'G3', cat:'★심화: 밸런스', text:'"나도 살고 우리도 사는 길"을 찾는 것이 나의 강점이다.', deep:true},
 
   // BLUE-B1: 신뢰
   {id:46, gear:'B1', cat:'정확성', text:'맡은 일은 빈틈없이 정확하게 처리하려 한다.', deep:false},
   {id:47, gear:'B1', cat:'신뢰 평가', text:'주변에서 나를 "믿고 맡길 수 있는 사람"이라고 평가한다.', deep:false},
   {id:48, gear:'B1', cat:'일관성', text:'한번 한 약속과 기준을 일관되게 지킨다.', deep:false},
   {id:49, gear:'B1', cat:'책임감', text:'작은 오류도 그냥 넘기지 않고 끝까지 확인한다.', deep:false},
-  {id:50, gear:'B1', cat:'★심화: 신뢰의 기반', text:'"정확함이 곧 신뢰"라는 말에 깊이 공감한다.', deep:true},
+  {id:50, gear:'B1', cat:'★심화: 신뢰', text:'"정확함이 곧 신뢰"라는 말에 깊이 공감한다.', deep:true},
   // BLUE-B2: 분석
   {id:51, gear:'B2', cat:'논리적 분해', text:'복잡한 문제도 논리적으로 분해하여 접근한다.', deep:false},
   {id:52, gear:'B2', cat:'차분한 해석', text:'급한 상황에서도 차분하게 원인을 분석하는 편이다.', deep:false},
   {id:53, gear:'B2', cat:'객관성', text:'감정보다 객관적 근거에 더 신뢰를 둔다.', deep:false},
   {id:54, gear:'B2', cat:'데이터 검토', text:'판단하기 전 데이터와 사실을 충분히 검토하는 편이다.', deep:false},
-  {id:55, gear:'B2', cat:'★심화: 해석의 힘', text:'복잡한 문제일수록 차분히 뜯어보면 답이 보인다고 믿는다.', deep:true},
+  {id:55, gear:'B2', cat:'★심화: 분석', text:'복잡한 문제일수록 차분히 뜯어보면 답이 보인다고 믿는다.', deep:true},
   // BLUE-B3: 체계
   {id:56, gear:'B3', cat:'정리·체계', text:'정보와 자료를 체계적으로 정리하는 것을 좋아한다.', deep:false},
   {id:57, gear:'B3', cat:'구조화', text:'복잡한 내용을 누구나 쓸 수 있는 틀과 시스템으로 만든다.', deep:false},
   {id:58, gear:'B3', cat:'전문성', text:'어떤 분야든 깊이 파고들어 전문성을 쌓는 편이다.', deep:false},
   {id:59, gear:'B3', cat:'완성도', text:'완성도 높은 결과물을 위해 충분한 시간을 투자한다.', deep:false},
-  {id:60, gear:'B3', cat:'★심화: 구조로 남기기', text:'"깊이는 구조로 남겨야 오래간다"는 말에 깊이 공감한다.', deep:true},
+  {id:60, gear:'B3', cat:'★심화: 체계', text:'"깊이는 구조로 남겨야 오래간다"는 말에 깊이 공감한다.', deep:true},
 ];
 
 const GEAR_DATA = {
-  R1: {name:'본능적 추진력', tagline:'강렬한 시작과 폭발적 에너지', engine:'RED', tags:['본능','시작','열정','개척'], desc:'아이디어가 떠오르는 순간 바로 행동으로 옮기는 본능적인 추진력. 계획보다 실행이 먼저인 스타일로, 강렬한 첫인상과 폭발적 에너지로 주변을 이끕니다.'},
-  R2: {name:'결과 지향 리더십', tagline:'도전과 성취의 화신', engine:'RED', tags:['도전','리더십','결과','성취'], desc:'목표를 향해 앞으로 나아가는 도전 정신이 강한 타고난 리더. 결과를 만들어내는 것에서 큰 성취감을 느끼며, 어떤 어려움도 "해볼 만한 도전"으로 받아들입니다.'},
-  R3: {name:'성과·완성의 에너지', tagline:'결과로 증명하는 사람', engine:'RED', tags:['성과','실행','완성','집중'], desc:'시작한 일을 끝까지 밀어붙여 성과로 만들어내는 완성의 에너지. 프로젝트를 결과물로 마무리하면서 자신의 정체성과 가치를 확인하며, 실행과 성과의 사이클을 빠르게 반복합니다.'},
-  Y1: {name:'연결의 본능', tagline:'관계 확장의 달인', engine:'YELLOW', tags:['연결','관계','네트워킹','확장'], desc:'사람을 만나고 관계를 넓혀가는 것이 본능적으로 즐거운 유형. 어디서나 자연스럽게 대화를 시작하고, 시너지를 만들어내는 능력이 탁월합니다.'},
-  Y2: {name:'따뜻한 공감 리더십', tagline:'마음을 여는 사람', engine:'YELLOW', tags:['공감','소통','신뢰','리더십'], desc:'따뜻한 말 한마디로 사람의 마음을 열고 신뢰를 쌓는 공감 리더. 경청과 공감을 바탕으로 팀의 분위기를 살리고 협력을 이끄는 힘이 있습니다.'},
-  Y3: {name:'창의적 표현력', tagline:'긍정 바이러스의 주인공', engine:'YELLOW', tags:['창의','표현','긍정','유쾌함'], desc:'독창적인 아이디어와 밝고 유쾌한 에너지로 주변을 환하게 만드는 유형. 생각을 다양한 방식으로 표현하며, 그 과정 자체에서 큰 기쁨을 얻습니다.'},
-  G1: {name:'평화·안정의 분위기', tagline:'편안함을 만드는 사람', engine:'GREEN', tags:['평화','안정','편안함','분위기'], desc:'사람과 자리를 편안하게 만드는 평화의 본능. 긴장된 공간에 안정감을 불어넣고, 누구나 마음을 놓을 수 있는 분위기를 자연스럽게 만들어냅니다.'},
-  G2: {name:'성장·회복의 동반', tagline:'다시 서도록 돕는 사람', engine:'GREEN', tags:['성장','회복','멘토링','지지'], desc:'넘어진 한 사람이 다시 일어서도록 곁에서 돕는 성장의 힘. 상대의 잠재력을 믿고 기다리며, 스스로 다시 설 수 있을 때까지 든든하게 지지합니다.'},
-  G3: {name:'균형·공존의 지혜', tagline:'함께 사는 길을 찾는 사람', engine:'GREEN', tags:['밸런스','균형','공존','조화'], desc:'자기 자신과 공동체를 함께 살리는 균형의 지혜. 어느 한쪽에 치우치지 않고, 개인과 전체가 모두 지속될 수 있는 길을 찾아냅니다.'},
-  B1: {name:'정확함이 쌓는 신뢰', tagline:'믿음을 만드는 사람', engine:'BLUE', tags:['신뢰','정확함','책임','신뢰성'], desc:'한 치의 오차도 놓치지 않는 정확함으로 믿음을 쌓는 신뢰의 힘. 빈틈없는 일처리와 일관된 약속으로 "맡기면 된다"는 신뢰를 만들어냅니다.'},
-  B2: {name:'차분한 분석·해석', tagline:'문제를 풀어내는 사람', engine:'BLUE', tags:['분석','논리','해석','객관성'], desc:'복잡한 문제 앞에서도 흔들리지 않고 차분히 원인을 해석하는 분석의 힘. 데이터와 논리로 상황을 분해하여 핵심을 짚어냅니다.'},
-  B3: {name:'체계·구조의 설계', tagline:'깊이를 구조로 남기는 사람', engine:'BLUE', tags:['체계','구조','전문성','정리'], desc:'깊이 파고든 지식과 경험을 체계와 구조로 남기는 힘. 복잡한 정보를 정리해 누구나 쓸 수 있는 시스템과 틀로 만들어냅니다.'}
+  R1: {name:'도전', tagline:'강렬한 시작과 폭발적 에너지', engine:'RED', tags:['본능','시작','열정','개척'], desc:'아이디어가 떠오르는 순간 바로 행동으로 옮기는 본능적인 추진력. 계획보다 실행이 먼저인 스타일로, 강렬한 첫인상과 폭발적 에너지로 주변을 이끕니다.'},
+  R2: {name:'열정', tagline:'도전과 성취의 화신', engine:'RED', tags:['도전','리더십','결과','성취'], desc:'목표를 향해 앞으로 나아가는 도전 정신이 강한 타고난 리더. 결과를 만들어내는 것에서 큰 성취감을 느끼며, 어떤 어려움도 "해볼 만한 도전"으로 받아들입니다.'},
+  R3: {name:'성과', tagline:'결과로 증명하는 사람', engine:'RED', tags:['성과','실행','완성','집중'], desc:'시작한 일을 끝까지 밀어붙여 성과로 만들어내는 완성의 에너지. 프로젝트를 결과물로 마무리하면서 자신의 정체성과 가치를 확인하며, 실행과 성과의 사이클을 빠르게 반복합니다.'},
+  Y1: {name:'발견', tagline:'관계 확장의 달인', engine:'YELLOW', tags:['연결','관계','네트워킹','확장'], desc:'사람을 만나고 관계를 넓혀가는 것이 본능적으로 즐거운 유형. 어디서나 자연스럽게 대화를 시작하고, 시너지를 만들어내는 능력이 탁월합니다.'},
+  Y2: {name:'공감', tagline:'마음을 여는 사람', engine:'YELLOW', tags:['공감','소통','신뢰','리더십'], desc:'따뜻한 말 한마디로 사람의 마음을 열고 신뢰를 쌓는 공감 리더. 경청과 공감을 바탕으로 팀의 분위기를 살리고 협력을 이끄는 힘이 있습니다.'},
+  Y3: {name:'창의', tagline:'긍정 바이러스의 주인공', engine:'YELLOW', tags:['창의','표현','긍정','유쾌함'], desc:'독창적인 아이디어와 밝고 유쾌한 에너지로 주변을 환하게 만드는 유형. 생각을 다양한 방식으로 표현하며, 그 과정 자체에서 큰 기쁨을 얻습니다.'},
+  G2: {name:'평화', tagline:'편안함을 만드는 사람', engine:'GREEN', tags:['평화','안정','편안함','분위기'], desc:'사람과 자리를 편안하게 만드는 평화의 본능. 긴장된 공간에 안정감을 불어넣고, 누구나 마음을 놓을 수 있는 분위기를 자연스럽게 만들어냅니다.'},
+  G1: {name:'배려', tagline:'다시 서도록 돕는 사람', engine:'GREEN', tags:['성장','회복','멘토링','지지'], desc:'넘어진 한 사람이 다시 일어서도록 곁에서 돕는 성장의 힘. 상대의 잠재력을 믿고 기다리며, 스스로 다시 설 수 있을 때까지 든든하게 지지합니다.'},
+  G3: {name:'밸런스', tagline:'함께 사는 길을 찾는 사람', engine:'GREEN', tags:['밸런스','균형','공존','조화'], desc:'자기 자신과 공동체를 함께 살리는 균형의 지혜. 어느 한쪽에 치우치지 않고, 개인과 전체가 모두 지속될 수 있는 길을 찾아냅니다.'},
+  B1: {name:'신뢰', tagline:'믿음을 만드는 사람', engine:'BLUE', tags:['신뢰','정확함','책임','신뢰성'], desc:'한 치의 오차도 놓치지 않는 정확함으로 믿음을 쌓는 신뢰의 힘. 빈틈없는 일처리와 일관된 약속으로 "맡기면 된다"는 신뢰를 만들어냅니다.'},
+  B2: {name:'분석', tagline:'문제를 풀어내는 사람', engine:'BLUE', tags:['분석','논리','해석','객관성'], desc:'복잡한 문제 앞에서도 흔들리지 않고 차분히 원인을 해석하는 분석의 힘. 데이터와 논리로 상황을 분해하여 핵심을 짚어냅니다.'},
+  B3: {name:'체계', tagline:'깊이를 구조로 남기는 사람', engine:'BLUE', tags:['체계','구조','전문성','정리'], desc:'깊이 파고든 지식과 경험을 체계와 구조로 남기는 힘. 복잡한 정보를 정리해 누구나 쓸 수 있는 시스템과 틀로 만들어냅니다.'}
 };
 
 const ENGINE_DATA = {
@@ -921,7 +932,7 @@ function buildSummary(){
       html+=`<div style="display:flex;align-items:center;gap:11px;padding:11px 0;border-bottom:1px dashed var(--border-subtle);">
         <span class="gtag" style="background:${gm.color};color:#fff;font-size:11px;font-weight:900;padding:3px 9px;border-radius:999px;flex-shrink:0;">${g}</span>
         <div style="flex:1;font-size:13px;font-weight:600;line-height:1.3;">${gd.name}</div>
-        <input id="sum-${g}" type="number" min="0" max="25" inputmode="numeric" placeholder="0~25" oninput="updateSumProgress()" style="width:84px;text-align:center;font-size:16px;font-weight:800;padding:10px 6px;border:1.5px solid var(--border-default);border-radius:var(--r-md);font-family:var(--font);">
+        <input id="sum-${g}" type="number" min="0" max="25" inputmode="numeric" enterkeyhint="next" placeholder="0~25" oninput="onSumInput(this)" onkeydown="if(event.key==='Enter'){event.preventDefault();sumFocusNext(this);}" style="width:84px;text-align:center;font-size:16px;font-weight:800;padding:10px 6px;border:1.5px solid var(--border-default);border-radius:var(--r-md);font-family:var(--font);">
       </div>`;
     });
     html+=`</div>`;
@@ -932,6 +943,21 @@ function updateSumProgress(){
   let n=0; for(const g of ALL_GEARS){ const el=document.getElementById('sum-'+g); if(el && el.value!=='' && !isNaN(parseInt(el.value))) n++; }
   const el=document.getElementById('sum-remain');
   if(el) el.textContent = n<12 ? `${12-n}개 항목이 남았습니다 (${n}/12)` : '12개 항목 입력 완료!';
+}
+/* 점수 입력 → 자동으로 다음 칸 이동 (5~25점) */
+function sumFocusNext(el){
+  const inputs=[...document.querySelectorAll('#summary-body input[id^="sum-"]')];
+  const i=inputs.indexOf(el);
+  if(i>-1 && i<inputs.length-1){ const nx=inputs[i+1]; nx.focus(); try{nx.select();}catch(e){} }
+  else if(i===inputs.length-1){ el.blur(); }
+}
+function onSumInput(el){
+  let v=el.value.replace(/[^0-9]/g,'').slice(0,2);   // 숫자만, 최대 2자리
+  if(v!==el.value) el.value=v;
+  updateSumProgress();
+  const n=parseInt(v,10);
+  // 2자리 다 채웠거나(10~25), 첫 자리가 3 이상(5~9는 한 자리 확정)이면 다음 칸으로
+  if(v.length>=2 || (v.length===1 && n>=3)) sumFocusNext(el);
 }
 function resultFromGearPercents(gp){
   const gearScores={}; ALL_GEARS.forEach(g=>gearScores[g]={percent:gp[g]});
@@ -1154,14 +1180,14 @@ function renderResult(){
   // 7) 소감 & PDF (친근한 리빌형)
   h+=`<div class="card no-print" style="text-align:center;background:var(--brand-gradient-soft);border:1px solid var(--border-default);">
     <div style="font-size:38px;line-height:1;">💜</div>
-    <h2 style="margin-top:6px;">오늘 진단, 어떠셨나요?</h2>
-    <p class="sub" style="max-width:440px;margin:8px auto 2px;">짧은 소감 한 줄이면 충분해요. 소감을 남겨주시면 나의 결과를 <b>예쁜 PDF</b>로 받아볼 수 있어요 📄</p>
+    <h2 style="margin-top:6px;font-size:24px;">오늘 진단, 어떠셨나요?</h2>
+    <p class="sub" style="max-width:440px;margin:8px auto 2px;font-size:15px;line-height:1.6;">짧은 소감 한 줄이면 충분해요. 소감을 남겨주시면 나의 결과를 <b>예쁜 PDF</b>로 받아볼 수 있어요 📄</p>
     <div id="survey-cta">
-      <button class="btn btn-primary btn-lg" style="max-width:360px;margin:12px auto 0;" onclick="openSurvey()">✍️ 소감 쓰고 결과 PDF 받기</button>
+      <button class="btn btn-primary btn-lg" style="max-width:380px;margin:14px auto 0;font-size:18px;padding:19px 16px;line-height:1.35;" onclick="openSurvey()">✍️ 소감 쓰고 결과 PDF 받기</button>
     </div>
     <div id="survey-block" style="display:none;text-align:left;margin-top:20px;">
       <div style="background:var(--bg-surface);border-radius:var(--r-lg);padding:18px;box-shadow:var(--shadow-sm);">
-        <p style="font-size:13px;font-weight:800;color:var(--brand-purple);margin-bottom:12px;">🎨 아주 잠깐이면 돼요</p>
+        <p style="font-size:15.5px;font-weight:800;color:var(--brand-purple);margin-bottom:14px;">🎨 아주 잠깐이면 돼요</p>
         ${surveyQ('sat','1. 지금 나는 내 강점 컬러를 일·삶에서 잘 활용하고 있다')}
         ${surveyQ('q1','2. 진단 결과가 나와 잘 맞았나요?')}
         ${surveyQ('q2','3. 지금 내 일·직무에 만족하나요?')}
@@ -1194,7 +1220,7 @@ function renderResult(){
   // 강사 프로필
   h+=`<div class="card no-print" style="padding:0;overflow:hidden;border:none;background:none;box-shadow:none;">
     <div class="profile-card">
-      <div style="font-size:11px;font-weight:800;letter-spacing:.1em;opacity:.85;margin-bottom:6px;">PBS 컬러강점 진단 개발자 · 대표</div>
+      <div style="font-size:12.5px;font-weight:800;letter-spacing:.08em;opacity:.9;margin-bottom:6px;">PBS 컬러강점 진단 개발자 · 대표</div>
       <h2>최해숙 대표</h2>
       <div class="ptitle">Choi Hae Sook · PBS COLOR LAB</div>
       <div class="pquote">"당신은 이미 특별합니다. 컬러는 그 특별함을 발견하고 자신답게 살아가는 도구일 뿐입니다."</div>
@@ -1250,7 +1276,7 @@ function renderResult(){
 function esc(s){ return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 let _fbSaved=false, _star=0, _satTouched=false, _sogaImg=null;
 function surveyQ(id,label){
-  return `<div class="field"><label>${label}</label>
+  return `<div class="field sv-q"><label>${label}</label>
     <div class="scale" data-sq="${id}">${[1,2,3,4,5].map(v=>`<button type="button" onclick="setSurvey('${id}',${v},this)">${v}</button>`).join('')}</div>
     <div class="scale-legend"><span>전혀 아니다</span><span>매우 그렇다</span></div></div>`;
 }
@@ -1721,6 +1747,11 @@ async function delRev(id){
   const {error}=await DB.rpc('admin_delete_review',{p_id:id,p_secret:ADMIN_PW});
   if(error){ toast('삭제 실패'); return; }
   ADMIN.reviews=ADMIN.reviews.filter(x=>x.id!==id); renderRev(); toast('삭제되었습니다');
+}
+</script>
+</body>
+</html>
+);
 }
 function exportCsv(){
   const rows=[['입력일시','진단날짜','직업군','이름','연령','소속','연락처','이메일','자료수신이메일','대표엔진','1위기어','강점활용도','설문공감','직무만족','자기이해','추천의향',...ALL_GEARS]];
