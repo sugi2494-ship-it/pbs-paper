@@ -267,40 +267,32 @@ body{font-family:var(--font);background:var(--bg-page);color:var(--text-primary)
     <div class="card">
       <div class="eyebrow">Step 1 / 3</div>
       <h2>참가자 기본 정보</h2>
-      <p class="sub">통계와 결과 확인을 위해 사용됩니다. <b>소속·연령대</b>만 필수입니다.</p>
-      <div class="grid2">
-        <div class="field">
-          <label>이름 <span class="opt">(선택)</span></label>
-          <input id="f-name" type="text" placeholder="실명 또는 닉네임" maxlength="20">
-        </div>
-        <div class="field">
-          <label>성별 <span class="opt">(선택)</span></label>
-          <select id="f-gender">
-            <option value="">선택하세요</option>
-            <option>남성</option><option>여성</option>
-          </select>
-        </div>
+      <p class="sub">통계와 결과 확인을 위해 사용됩니다. <b>직업·소속과 연령대</b>만 필수입니다.</p>
+      <div class="field">
+        <label>이름 <span class="opt">(선택)</span></label>
+        <input id="f-name" type="text" placeholder="실명 또는 닉네임" maxlength="20">
       </div>
-      <div class="grid2">
-        <div class="field">
-          <label>진단날짜 <span class="req">*</span></label>
-          <input id="f-date" type="date">
-        </div>
-        <div class="field">
-          <label>연령대 <span class="req">*</span></label>
-          <select id="f-age">
-            <option value="">선택하세요</option>
-            <option>10대</option><option>20대</option><option>30대</option>
-            <option>40대</option><option>50대</option><option>60대 이상</option>
-          </select>
-        </div>
+      <div class="field">
+        <label>연락처 또는 이메일 <span class="opt">(선택)</span></label>
+        <input id="f-contact" type="text" placeholder="휴대폰 번호 또는 이메일 주소" maxlength="60">
+        <div class="hint">결과 재확인·문의 회신을 원하시면 입력하세요. 입력하지 않아도 결과 확인이 가능합니다.</div>
       </div>
       <div class="field">
         <label>직업 · 소속(회사명) <span class="req">*</span></label>
         <input id="f-job" type="text" placeholder="예: 마케팅팀 / OO기업 / OO학교" maxlength="40">
       </div>
       <div class="field">
-        <label>직업군 <span class="req">*</span></label>
+        <label>연령대 <span class="req">*</span></label>
+        <select id="f-age">
+          <option value="">선택하세요</option>
+          <option>10대</option><option>20대</option><option>30대</option>
+          <option>40대</option><option>50대</option><option>60대 이상</option>
+        </select>
+      </div>
+      <!-- 입력 간소화(2026-09-30): 성별·진단날짜·직업군은 화면에서 숨김. 코드 호환을 위해 칸은 남겨둠 (진단날짜는 오늘 날짜 자동) -->
+      <div style="display:none">
+        <select id="f-gender"><option value="">선택하세요</option><option>남성</option><option>여성</option></select>
+        <input id="f-date" type="date">
         <select id="f-jobgroup">
           <option value="">선택하세요</option>
           <option value="mgmt">경영·관리</option><option value="sales_mkt">영업·마케팅</option><option value="office_admin">사무·행정</option>
@@ -308,11 +300,6 @@ body{font-family:var(--font);background:var(--bg-page);color:var(--text-primary)
           <option value="medical">의료·보건</option><option value="art_design">예술·디자인</option><option value="service_retail">서비스·판매</option>
           <option value="production">생산·현장</option><option value="student">학생</option><option value="homemaker_etc">주부·기타</option>
         </select>
-      </div>
-      <div class="field">
-        <label>연락처 또는 이메일 <span class="opt">(선택)</span></label>
-        <input id="f-contact" type="text" placeholder="휴대폰 번호 또는 이메일 주소" maxlength="60">
-        <div class="hint">결과 재확인·문의 회신을 원하시면 입력하세요. 입력하지 않아도 결과 확인이 가능합니다.</div>
       </div>
       <label style="display:flex;gap:9px;align-items:flex-start;font-size:12.5px;color:var(--text-secondary);cursor:pointer;margin-top:4px;">
         <input id="f-consent" type="checkbox" style="width:auto;margin-top:3px;flex-shrink:0;">
@@ -837,7 +824,6 @@ function goQuiz(){
   const job=document.getElementById('f-job').value.trim();
   const jobGroup=document.getElementById('f-jobgroup').value;
   const contact=document.getElementById('f-contact').value.trim();
-  if(!jobGroup){ toast('직업군을 선택해주세요'); return; }
   if(!job){ toast('직업 또는 소속을 입력해주세요'); return; }
   if(!age){ toast('연령대를 선택해주세요'); return; }
   const isEmail=/@/.test(contact);
@@ -845,7 +831,7 @@ function goQuiz(){
     name:document.getElementById('f-name').value.trim(),
     gender:document.getElementById('f-gender').value||'',
     job:job, jobGroup:jobGroup,
-    jobGroupLabel:(document.getElementById('f-jobgroup').selectedOptions[0]||{}).text||jobGroup,
+    jobGroupLabel:jobGroup?((document.getElementById('f-jobgroup').selectedOptions[0]||{}).text||jobGroup):'',
     age:age,
     diagDate:document.getElementById('f-date').value||new Date().toISOString().slice(0,10),
     email:isEmail?contact:'',
@@ -1751,11 +1737,6 @@ async function delRev(id){
   const {error}=await DB.rpc('admin_delete_review',{p_id:id,p_secret:ADMIN_PW});
   if(error){ toast('삭제 실패'); return; }
   ADMIN.reviews=ADMIN.reviews.filter(x=>x.id!==id); renderRev(); toast('삭제되었습니다');
-}
-</script>
-</body>
-</html>
-);
 }
 function exportCsv(){
   const rows=[['입력일시','진단날짜','직업군','이름','연령','소속','연락처','이메일','자료수신이메일','대표엔진','1위기어','강점활용도','설문공감','직무만족','자기이해','추천의향',...ALL_GEARS]];
